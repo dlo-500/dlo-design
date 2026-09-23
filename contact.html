@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' https: data:; connect-src 'self' https://*.supabase.co https://challenges.cloudflare.com; frame-src https://challenges.cloudflare.com; object-src 'none'; base-uri 'self'; form-action 'self';">
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+<meta name="description" content="Contact District Litigation Office Kupwara">
+<meta name="theme-color" content="#0B2545">
+<title>Contact | DLO Kupwara</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;600;700&family=Roboto:wght@300;400;500&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+:root{--navy:#0A1F3D;--navy-mid:#123059;--gold:#C6A358;--gold-light:#E0C083;}
+.section-title{font-family:'Playfair Display',serif!important}
+.btn-primary{background:linear-gradient(135deg,var(--gold-light),var(--gold))!important;color:var(--navy)!important}
+</style>
+<meta property="og:title" content="Contact | DLO Kupwara">
+<meta property="og:description" content="Contact details and message form — District Litigation Office Kupwara">
+<meta property="og:type" content="website">
+<meta name="robots" content="index,follow">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-inner">
+    <span>Government of Jammu &amp; Kashmir | Department of Law, Justice &amp; Parliamentary Affairs</span>
+    <div><a href="index.html">Home</a></div>
+  </div>
+</div>
+
+<nav>
+  <div class="nav-inner">
+    <div class="nav-brand">
+      <div class="nav-emblem"><img src="logo.png" alt="Logo" style="width:48px;height:48px;border-radius:50%;object-fit:cover" onerror="this.style.display='none'"></div>
+      <div class="nav-title"><h1>District Litigation Office Kupwara</h1><p>Contact Us</p></div>
+    </div>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="about-office.html">About</a>
+      <a href="contact.html" class="active btn-nav">Contact</a>
+    </div>
+  </div>
+</nav>
+
+<section class="contact-section chess-bg" id="contact" style="padding-top:60px">
+  <div class="container">
+    <div class="contact-grid">
+      <!-- LEFT: Details -->
+      <div>
+        <span class="section-eyebrow" style="color:var(--gold-light)">Get in Touch</span>
+        <h2 class="section-title light" style="color:#fff">Contact the District<br>Litigation Office</h2>
+        <div class="divider"></div>
+
+        <div class="contact-detail">
+          <div class="icon">📍</div>
+          <div>
+            <h4>Office Address</h4>
+            <p>District Court Complex, Kupwara<br>Jammu &amp; Kashmir — 193222</p>
+          </div>
+        </div>
+        <div class="contact-detail">
+          <div class="icon">🏛️</div>
+          <div>
+            <h4>Parent Department</h4>
+            <p>Department of Law, Justice &amp; Parliamentary Affairs<br>Government of Jammu &amp; Kashmir</p>
+          </div>
+        </div>
+        <div class="contact-detail">
+          <div class="icon">⏰</div>
+          <div>
+            <h4>Working Hours</h4>
+            <p>Monday – Saturday<br>10:00 AM – 4:00 PM (Court hours may vary)</p>
+          </div>
+        </div>
+        <div class="contact-detail">
+          <div class="icon">📧</div>
+          <div>
+            <h4>Official Correspondence</h4>
+            <p>Use the enquiry form on this page or the Public Enquiries page for all official communication. Personal mobile numbers of officers are not published online.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Compact form -->
+      <div class="contact-form-box">
+        <h3 style="color:#fff;margin-bottom:20px;font-family:'Playfair Display',serif">Quick Message</h3>
+        <div class="form-group">
+          <label>Name *</label>
+          <input type="text" id="cFormName" maxlength="80" required autocomplete="name">
+        </div>
+        <div class="form-group">
+          <label>Email *</label>
+          <input type="email" id="cFormEmail" maxlength="100" required autocomplete="email">
+        </div>
+        <div class="form-group">
+          <label>Message *</label>
+          <textarea id="cFormMessage" maxlength="800" required rows="4"></textarea>
+        </div>
+        <input type="text" id="cHoneypot" autocomplete="off" tabindex="-1" style="position:absolute;left:-9999px;opacity:0" aria-hidden="true">
+        <button type="button" class="btn-primary" style="width:100%;border:none;padding:12px" id="cSubmitBtn">Send Message</button>
+        <div id="cFormStatus" style="margin-top:12px;font-size:13px;text-align:center;display:none"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <h3>⚖️ District Litigation Office Kupwara</h3>
+        <p>An office of the Department of Law, Justice &amp; Parliamentary Affairs, Government of Jammu &amp; Kashmir.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Quick Links</h4>
+        <a href="about-office.html">About the Office</a>
+        <a href="search-filter-cases.html">Filter Cases</a>
+        <a href="analytics.html">Analytics</a>
+        <a href="public-enquiries.html">Public Enquiries</a>
+      </div>
+      <div class="footer-col">
+        <h4>Important Courts</h4>
+        <a href="#">Sessions Court Kupwara</a>
+        <a href="#">Sub Judge Court Kupwara</a>
+        <a href="#">CJM Court Handwara</a>
+        <a href="#">Munsiff Court Sogam</a>
+      </div>
+    </div>
+    <div class="footer-bottom" style="justify-content:center;text-align:center;margin-top:24px">
+      <p>© District Litigation Office Kupwara · VERSION: NK.1.0 · Internal use only</p>
+    </div>
+  </div>
+</footer>
+
+<script src="config.js" defer></script>
+<script src="common.js" defer></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  if (window.DLO) {
+    DLO.registerSW();
+    var rb = document.getElementById("resultsBody") || document.getElementById("deptPerfBody") || document.getElementById("statsGrid");
+    if (rb && DLO.showSkeleton && (!rb.children.length || rb.innerHTML.trim() === "")) {
+      DLO.showSkeleton(rb, 5);
+    }
+  }
+});
+</script>
+
+</body>
+</html>
