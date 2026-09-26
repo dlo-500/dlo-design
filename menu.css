@@ -1,0 +1,407 @@
+/**
+ * DLO Kupwara — Shared Navigation Component
+ * ────────────────────────────────────────────────────────────────
+ * One curtain-style menu, one "About the Developer" trigger, used
+ * identically on every page. Injected by common.js (see injectMenu()).
+ *
+ * Namespacing: every custom property below is prefixed --k- so it
+ * can never collide with a page's own --navy / --gold / --text /
+ * --muted tokens. This stylesheet is additive only — it never
+ * overrides a page's existing design.
+ *
+ * Fonts: Cinzel + Plus Jakarta Sans are pulled in here via @import
+ * so no page has to add its own <link>. This is allowed under the
+ * existing CSP on every page (style-src already permits
+ * fonts.googleapis.com, font-src already permits fonts.gstatic.com).
+ */
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+:root {
+  /* Professional white-grey palette — the curtain's own fixed identity,
+     matching the light/navy-gold look every content page already uses via
+     styles.css. Deliberately does NOT respond to body.light-mode: the
+     curtain always looks like this regardless of the site-wide theme
+     toggle below, which instead controls index.html's separate dark hero. */
+  --k-curtain-bg: #f7f8fa;
+  --k-panel: #ffffff;
+  --k-gold: #c5a059;
+  --k-gold-light: #ad8548;
+  --k-gold-hairline: rgba(197, 160, 89, 0.4);
+  --k-border: rgba(15, 23, 42, 0.10);
+  --k-text: #0f172a;
+  --k-text-silver: #334155;
+  --k-text-muted: #64748b;
+}
+
+/* ── TOOLBAR — fixed top-right on every page: search, language, size, menu ── */
+.k-toolbar {
+  position: fixed;
+  top: 14px;
+  right: 14px;
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.k-toolbar-item { position: relative; display: flex; }
+
+/* Shared circular icon-button style for Search / Language / Size */
+.k-toolbar-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--k-panel);
+  border: 1px solid var(--k-border);
+  color: var(--k-text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  text-decoration: none;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+.k-toolbar-btn:hover { border-color: var(--k-gold); transform: translateY(-1px); }
+.k-toolbar-btn:focus-visible { outline: 2px solid var(--k-gold); outline-offset: 2px; }
+.k-toolbar-btn svg { width: 17px; height: 17px; }
+.k-size-icon { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; font-weight: 700; font-size: 15px; }
+
+/* Popover — used by both Language and Size buttons */
+.k-popover {
+  display: none;
+  pointer-events: none; /* defence-in-depth: closed popovers never intercept taps */
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 150px;
+  background: var(--k-panel);
+  border: 1px solid var(--k-border);
+  border-radius: 10px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
+  padding: 6px;
+  z-index: 1210;
+}
+.k-popover.open { display: block; pointer-events: auto; }
+.k-popover-item {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--k-text);
+  cursor: pointer;
+  text-align: left;
+}
+.k-popover-item:hover { background: rgba(197, 160, 89, 0.12); color: var(--k-gold); }
+.k-popover-item-sub { font-size: 11px; font-weight: 500; color: var(--k-text-muted); }
+
+/* Menu trigger — now a flex child of .k-toolbar rather than independently fixed */
+.k-menu-trigger {
+  background: var(--k-panel);
+  border: 1px solid var(--k-border);
+  border-radius: 999px;
+  padding: 8px 16px 8px 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+  color: var(--k-text);
+  flex-shrink: 0;
+  transition: opacity 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+}
+.k-menu-trigger:hover { transform: translateY(-1px); border-color: var(--k-gold); }
+.k-menu-trigger:focus-visible {
+  outline: 2px solid var(--k-gold);
+  outline-offset: 2px;
+}
+.k-menu-lines {
+  width: 20px;
+  height: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.k-menu-lines span {
+  width: 100%;
+  height: 2px;
+  background-color: var(--k-gold);
+  border-radius: 1px;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
+}
+.k-menu-trigger.is-active .k-menu-lines span:nth-child(1) { transform: translateY(5px) rotate(45deg); }
+.k-menu-trigger.is-active .k-menu-lines span:nth-child(2) { opacity: 0; }
+.k-menu-trigger.is-active .k-menu-lines span:nth-child(3) { transform: translateY(-5px) rotate(-45deg); }
+.k-menu-label {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* ── CURTAIN OVERLAY ──────────────────────────────────────────── */
+.k-curtain {
+  position: fixed;
+  inset: 0;
+  background-color: var(--k-curtain-bg);
+  backdrop-filter: blur(28px);
+  z-index: 1300;
+  display: flex;
+  flex-direction: column;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(2%);
+  transition: opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1), transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.k-curtain.open {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+.k-curtain-topbar {
+  flex-shrink: 0;
+  padding: 1.1rem 2rem;
+  border-bottom: 1px solid var(--k-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.k-curtain-brand {
+  font-family: 'Cinzel', serif;
+  font-size: 1rem;
+  letter-spacing: 0.08em;
+  color: var(--k-text);
+  text-transform: uppercase;
+}
+.k-curtain-topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+.k-theme-toggle {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid var(--k-border);
+  background: var(--k-curtain-bg);
+  color: var(--k-text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+.k-theme-toggle:hover { border-color: var(--k-gold); color: var(--k-gold); }
+.k-theme-toggle:focus-visible { outline: 2px solid var(--k-gold); outline-offset: 2px; }
+.k-theme-toggle svg { width: 17px; height: 17px; }
+.k-curtain-close {
+  background: transparent;
+  border: 1px solid var(--k-border);
+  color: var(--k-text-muted);
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding: 0.55rem 1.2rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.k-curtain-close:hover {
+  border-color: var(--k-gold);
+  color: var(--k-text);
+  background: rgba(197, 160, 89, 0.12);
+}
+.k-curtain-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  justify-content: flex-end;
+  padding: 1.5rem 2rem 4rem;
+}
+.k-curtain-list {
+  list-style: none;
+  width: 100%;
+  max-width: 560px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  margin: 0;
+  padding: 0;
+}
+.k-curtain-item {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 0.6rem;
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+.k-curtain.open .k-curtain-item { opacity: 1; transform: translateY(0); }
+.k-curtain.open .k-curtain-item:nth-child(1)  { transition-delay: 0.03s; }
+.k-curtain.open .k-curtain-item:nth-child(2)  { transition-delay: 0.06s; }
+.k-curtain.open .k-curtain-item:nth-child(3)  { transition-delay: 0.09s; }
+.k-curtain.open .k-curtain-item:nth-child(4)  { transition-delay: 0.12s; }
+.k-curtain.open .k-curtain-item:nth-child(5)  { transition-delay: 0.15s; }
+.k-curtain.open .k-curtain-item:nth-child(6)  { transition-delay: 0.18s; }
+.k-curtain.open .k-curtain-item:nth-child(7)  { transition-delay: 0.21s; }
+.k-curtain.open .k-curtain-item:nth-child(8)  { transition-delay: 0.24s; }
+.k-curtain.open .k-curtain-item:nth-child(9)  { transition-delay: 0.27s; }
+.k-curtain.open .k-curtain-item:nth-child(10) { transition-delay: 0.30s; }
+.k-curtain.open .k-curtain-item:nth-child(11) { transition-delay: 0.33s; }
+.k-curtain.open .k-curtain-item:nth-child(12) { transition-delay: 0.36s; }
+.k-curtain.open .k-curtain-item:nth-child(13) { transition-delay: 0.39s; }
+.k-curtain.open .k-curtain-item:nth-child(14) { transition-delay: 0.42s; }
+.k-curtain.open .k-curtain-item:nth-child(15) { transition-delay: 0.45s; }
+.k-curtain.open .k-curtain-item:nth-child(16) { transition-delay: 0.48s; }
+
+.k-curtain-link {
+  pointer-events: auto;
+  touch-action: manipulation;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 1rem;
+  padding: 3px 0;
+  cursor: pointer;
+  position: relative;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--k-text-silver);
+  transition: color 0.25s ease, transform 0.3s cubic-bezier(0.16,1,0.3,1), opacity 0.25s ease;
+}
+.k-curtain-list:hover .k-curtain-link { opacity: 0.35; }
+.k-curtain-list .k-curtain-link:hover {
+  opacity: 1;
+  color: var(--k-text);
+  transform: translateX(-8px);
+}
+.k-curtain-link .num {
+  font-size: 0.8rem;
+  letter-spacing: 0.16em;
+  color: var(--k-gold);
+  font-weight: 700;
+}
+.k-curtain-link::after {
+  content: '';
+  position: absolute;
+  bottom: 0; right: 0;
+  width: 0; height: 1.5px;
+  background: var(--k-gold);
+  transition: width 0.3s cubic-bezier(0.16,1,0.3,1);
+}
+.k-curtain-link:hover::after { width: 100%; }
+/* current page marked, never linked to itself */
+.k-curtain-link[aria-current="page"] {
+  color: var(--k-gold-light);
+  pointer-events: none;
+  cursor: default;
+}
+.k-curtain-link[aria-current="page"] .num { color: var(--k-gold-light); }
+
+/* ── DEVELOPER INFO ICON — bottom-left of the curtain, always visible ── */
+.k-dev-icon {
+  position: absolute;
+  left: 1.5rem;
+  bottom: 1.5rem;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid var(--k-border);
+  background: var(--k-panel);
+  color: var(--k-text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+.k-dev-icon:hover { border-color: var(--k-gold); color: var(--k-gold); }
+.k-dev-icon:focus-visible { outline: 2px solid var(--k-gold); outline-offset: 2px; }
+.k-dev-icon svg { width: 16px; height: 16px; }
+
+/* ── DEVELOPER MODAL ──────────────────────────────────────────── */
+.k-modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(2, 4, 8, 0.85);
+  backdrop-filter: blur(12px);
+  z-index: 1400;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+.k-modal-overlay.open { display: flex; }
+.k-modal-card {
+  background: var(--k-panel);
+  border: 1px solid var(--k-gold-hairline);
+  max-width: 420px;
+  width: 100%;
+  padding: 2.2rem;
+  position: relative;
+  text-align: center;
+  border-radius: 6px;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.55);
+}
+.k-modal-close {
+  position: absolute;
+  top: 1rem; right: 1rem;
+  background: transparent;
+  border: none;
+  color: var(--k-text-muted);
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+.k-modal-close:hover { color: var(--k-text); }
+.k-dev-eyebrow {
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--k-gold);
+  font-weight: 700;
+}
+.k-dev-name {
+  font-family: 'Playfair Display', 'Cinzel', serif;
+  font-size: 1.4rem;
+  color: var(--k-text);
+  margin: 8px 0 4px;
+}
+.k-dev-role {
+  font-size: 0.82rem;
+  color: var(--k-gold-light);
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+.k-dev-desc {
+  font-size: 0.8rem;
+  color: var(--k-text-muted);
+  line-height: 1.6;
+}
+
+@media (max-width: 640px) {
+  .k-curtain-body { padding: 1rem 1.25rem 5rem; }
+  .k-curtain-link { font-size: 0.95rem; }
+  .k-dev-icon { left: 1rem; bottom: 1rem; }
+  /* Tighter, icon-only toolbar on phones — four buttons need to fit without
+     colliding with the government-identification banner text that now runs
+     full-width in .topbar-inner (its old Home/Contact links, which used to
+     reserve space on the right, have been removed). */
+  .k-toolbar { top: 8px; right: 8px; gap: 6px; }
+  .k-toolbar-btn { width: 34px; height: 34px; }
+  .k-menu-trigger { padding: 8px; gap: 0; }
+  .k-menu-label { display: none; }
+  .k-popover { right: -6px; }
+}
