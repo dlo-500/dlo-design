@@ -1,0 +1,80 @@
+/**
+ * DLO Kupwara — Central Configuration
+ * Single source of truth for office details, team, courts, and app version.
+ * Update this file only when office information changes.
+ */
+window.DLO_CONFIG = {
+  version: '2.1.0',
+  buildDate: '2026-09-21',
+
+  /**
+   * Supabase connection — SINGLE SOURCE OF TRUTH.
+   * Previously this URL + anon key were hardcoded separately inside
+   * causelist.html, hearings.html, history.html, operator.html and
+   * performance.html (5 copies of the same string), with department.html
+   * left blank and never wired up at all. Every page must now read from
+   * here instead of declaring its own copy — see common.js → DLO.getSupabaseClient().
+   *
+   * SECURITY NOTE: the anon key is meant to be public (it's shipped to every
+   * browser) — it is safe ONLY because Row Level Security (RLS) is enforced
+   * on every table it touches. Rotating the key or the URL now means editing
+   * exactly one line, in exactly one file.
+   */
+  supabase: {
+    url: 'https://ibicsdsehxlsaygjnefk.supabase.co',
+    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImliaWNzZHNlaHhsc2F5Z2puZWZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM0MjQxOTgsImV4cCI6MjA5OTAwMDE5OH0.VzI27sIsfb5AOOhF1zOmaeJPuoE0AnrzeavxWCWElsU'
+  },
+
+  office: {
+    fullName: 'District Litigation Office Kupwara',
+    shortName: 'DLO Kupwara',
+    department: 'Department of Law, Justice & Parliamentary Affairs',
+    government: 'Government of Jammu & Kashmir',
+    address: 'District Court Complex, Kupwara, Jammu & Kashmir – 193222',
+    phone: '+91-1955-XXXXXX',
+    email: 'dlo.kupwara@jk.gov.in',
+    website: 'https://dlokupwara.in',
+    workingHours: 'Mon–Sat 10:00 AM – 4:30 PM (IST)'
+  },
+
+  // Officials (update names/designations as required)
+  officials: [
+    { role: 'District Litigation Officer', name: '—', order: 1 },
+    { role: 'Superintendent', name: '—', order: 2 },
+    { role: 'Standing Counsel', name: '—', order: 3 },
+    { role: 'Junior Assistant', name: '—', order: 4 }
+  ],
+
+  // Courts commonly handled (used by filters & distribution)
+  courts: [
+    'District Court Kupwara',
+    'Additional District Court Kupwara',
+    'Chief Judicial Magistrate Kupwara',
+    'Munsiff Court Kupwara',
+    'Special Mobile Magistrate',
+    'High Court of J&K and Ladakh (Srinagar Wing)'
+  ],
+
+  // Case status vocabulary used across filters & analytics
+  statuses: ['Pending', 'Disposed', 'Transferred', 'Stayed', 'Ex-parte'],
+
+  // Departments
+  departments: [
+    'Revenue', 'Police', 'Forest', 'PWD', 'Education',
+    'Health', 'Irrigation', 'Social Welfare', 'Others'
+  ],
+
+  // Theme defaults
+  theme: {
+    defaultMode: 'dark',          // 'dark' | 'light'
+    storageKey: 'dlo-theme-mode'
+  },
+
+  // Feature flags (client-side)
+  features: {
+    skeletons: true,
+    toasts: true,
+    offlineToast: true,
+    themeToggle: true
+  }
+};
