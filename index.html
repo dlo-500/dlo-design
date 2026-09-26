@@ -1,0 +1,2065 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<script>
+/* Apply app-mode BEFORE first paint when running as installed PWA */
+(function(){
+  try {
+    var s = window.matchMedia && window.matchMedia('(display-mode: standalone)').matches;
+    var ios = window.navigator.standalone === true;
+    var q = /(?:\?|&)app=1(?:&|$)/.test(location.search || '');
+    if (s || ios || q) {
+      document.documentElement.classList.add('app-mode');
+    }
+  } catch (e) {}
+})();
+</script>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https:; connect-src 'self' https://cloudflareinsights.com; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests;">
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+<meta http-equiv="Permissions-Policy" content="geolocation=(), camera=(), microphone=()">
+<meta name="description" content="District Litigation Office Kupwara — Official Portal. Department of Law, Justice & Parliamentary Affairs, Government of Jammu & Kashmir.">
+<meta name="theme-color" content="#020408">
+<link rel="manifest" href="manifest.json">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="DLO Kupwara">
+
+<title>District Litigation Office Kupwara | Official Legal Registry</title>
+
+<!-- Cloudflare Web Analytics -->
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "13c9c451d4a0426ab17029262ad729db"}'></script>
+
+<!-- Editorial Typography Stack -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="menu.css">
+<script src="config.js"></script>
+<script src="common.js"></script>
+<style>
+/* ─────────────────────────────────────────────────────────────
+   1. DUAL THEME ENGINE (DARK OBSIDIAN / LIGHT IVORY PARCHMENT)
+   ───────────────────────────────────────────────────────────── */
+:root {
+  --bg-black: #020408;
+  --bg-deep: #050811;
+  --k-curtain-bg: #040814;
+  --k-panel: #070b16;
+  --k-gold: #c5a059;
+  --k-gold-light: #e5cb93;
+  --k-gold-hairline: rgba(197, 160, 89, 0.45);
+  --k-border: rgba(255, 255, 255, 0.08);
+  --k-text: #ffffff;
+  --k-text-silver: #cbd5e1;
+  --k-text-muted: #94a3b8;
+  --k-text-dim: #64748b;
+  --topbar-bg: #010204;
+  --header-bg: rgba(2, 4, 8, 0.96);
+  --dock-bg: #010307;
+  --dock-hover: #060914;
+  --moon-fill: #000000;
+  --moon-btn-bg: #ffffff;
+  --page-shadow: rgba(0, 0, 0, 0.55);
+}
+
+body.light-mode {
+  --bg-black: #f8fafc;
+  --bg-deep: #f1f5f9;
+  --k-curtain-bg: #f5f7fb;
+  --k-panel: #ffffff;
+  --k-gold: #967433;
+  --k-gold-light: #7c5e26;
+  --k-gold-hairline: rgba(150, 116, 51, 0.4);
+  --k-border: rgba(15, 23, 42, 0.12);
+  --k-text: #090e1a;
+  --k-text-silver: #334155;
+  --k-text-muted: #64748b;
+  --k-text-dim: #94a3b8;
+  --topbar-bg: #e2e8f0;
+  --header-bg: rgba(248, 250, 252, 0.96);
+  --dock-bg: #ffffff;
+  --dock-hover: #f1f5f9;
+  --moon-fill: #000000;
+  --moon-btn-bg: rgba(15, 23, 42, 0.08);
+  --page-shadow: rgba(150, 116, 51, 0.18);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  background-color: var(--bg-black);
+  color: var(--k-text);
+  font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   TOP INSTITUTIONAL BAR
+   ───────────────────────────────────────────────────────────── */
+.topbar {
+  display: none;
+}
+.badge-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #10b981;
+  font-weight: 600;
+}
+.pulse-dot {
+  width: 5px;
+  height: 5px;
+  background: #10b981;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #10b981;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   SITE HEADER & CONTROLS
+   ───────────────────────────────────────────────────────────── */
+header.site-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 950;
+  background: transparent;
+  backdrop-filter: none;
+  border-bottom: none;
+  padding: 1.25rem 2.75rem;
+  padding-top: max(1.25rem, env(safe-area-inset-top));
+}
+.header-inner {
+  max-width: 1600px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.brand-lockup {
+  text-decoration: none;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.85rem;
+}
+.brand-emblem {
+  width: 58px;
+  height: 58px;
+  object-fit: contain;
+  flex-shrink: 0;
+  display: block;
+}
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.brand-lockup h1 {
+  font-family: 'Cinzel', serif;
+  font-size: 1.22rem;
+  letter-spacing: 0.1em;
+  font-weight: 700;
+  color: var(--k-text);
+  text-transform: uppercase;
+}
+.brand-lockup p {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--k-gold);
+  margin-top: 4px;
+  font-weight: 600;
+}
+
+.header-action-cluster {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-shrink: 0;
+}
+.header-action-cluster .btn-theme-moon,
+.header-action-cluster .btn-header-search {
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1101;
+}
+
+/* Hide header controls whenever menu is open */
+html.menu-open .header-action-cluster .btn-theme-moon,
+html.menu-open .header-action-cluster .btn-header-search,
+body.menu-open .header-action-cluster .btn-theme-moon,
+body.menu-open .header-action-cluster .btn-header-search,
+.header-action-cluster:has(.btn-menu-trigger.is-active) .btn-theme-moon,
+.header-action-cluster:has(.btn-menu-trigger.is-active) .btn-header-search {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  border: none !important;
+}
+
+/* Deactivate header pointer events and completely hide the trigger button in open state */
+html.menu-open header.site-header,
+body.menu-open header.site-header {
+  pointer-events: none;
+}
+
+html.menu-open .header-action-cluster .btn-menu-trigger,
+body.menu-open .header-action-cluster .btn-menu-trigger {
+  display: none !important;
+}
+
+/* Curtain's own theme toggle stays visible and usable while the menu is open */
+.fullscreen-curtain.open .curtain-topbar .btn-theme-moon {
+  display: flex !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+}
+
+.btn-theme-moon {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid var(--k-border);
+  background: var(--moon-btn-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.25s ease, border-color 0.25s ease, background-color 0.25s ease;
+}
+.btn-theme-moon:hover {
+  transform: scale(1.08);
+  border-color: var(--k-gold);
+}
+.btn-theme-moon svg {
+  width: 18px;
+  height: 18px;
+  fill: var(--moon-fill);
+  color: var(--moon-fill);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   DRAMATIC 3-BAR TO CROSS (✕) MORPHING BUTTON
+   ───────────────────────────────────────────────────────────── */
+.btn-header-search {
+  width: 42px;
+  height: 42px;
+  border: none;
+  background: transparent;
+  color: var(--k-text);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: color 0.2s ease, background 0.2s ease;
+}
+.btn-header-search:hover {
+  color: var(--k-gold);
+  background: rgba(255,255,255,0.06);
+}
+.btn-header-search svg {
+  width: 22px;
+  height: 22px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.75;
+}
+
+.btn-menu-trigger {
+  background: transparent;
+  border: none;
+  padding: 8px 10px;
+  border-radius: 0;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: var(--k-text);
+  transition: opacity 0.25s ease;
+  position: relative;
+  z-index: 1200;
+  min-width: 52px;
+  isolation: isolate;
+}
+.btn-menu-trigger:hover {
+  opacity: 0.85;
+}
+.menu-label {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--k-text);
+  order: 2;
+  line-height: 1;
+}
+.btn-menu-trigger:hover .menu-label {
+  color: var(--k-gold-light);
+}
+
+.menu-lines-3 {
+  width: 26px;
+  height: 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  order: 1;
+}
+.menu-lines-3 span {
+  width: 100%;
+  height: 2.5px;
+  background-color: #e85d04;
+  border-radius: 1px;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 0.25s ease,
+              background-color 0.25s ease;
+  transform-origin: center;
+}
+body.light-mode .menu-lines-3 span {
+  background-color: #e85d04;
+}
+
+.btn-menu-trigger.is-active .menu-lines-3 span {
+  background-color: #e53935;
+}
+.btn-menu-trigger.is-active .menu-lines-3 span:nth-child(1) {
+  transform: translateY(5.75px) rotate(45deg);
+}
+.btn-menu-trigger.is-active .menu-lines-3 span:nth-child(2) {
+  opacity: 0;
+  transform: scaleX(0);
+}
+.btn-menu-trigger.is-active .menu-lines-3 span:nth-child(3) {
+  transform: translateY(-5.75px) rotate(-45deg);
+}
+.btn-menu-trigger.is-active .menu-label {
+  color: var(--k-text);
+}
+header.site-header {
+  z-index: 1200;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   MENU CURTAIN: OPTIONS FLUSH TO THE EXTREME RIGHT
+   ───────────────────────────────────────────────────────────── */
+.fullscreen-curtain {
+  position: fixed;
+  inset: 0;
+  background-color: var(--k-curtain-bg);
+  background-image:
+    radial-gradient(ellipse at 85% 45%, rgba(197, 160, 89, 0.10), transparent 60%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1600' height='900' viewBox='0 0 1600 900'%3E%3Cg fill='none' stroke='%23C5A059' stroke-width='1' stroke-opacity='0.16'%3E%3Cpath d='M-100 420 Q 400 250, 800 420 T 1700 420'/%3E%3Cpath d='M-100 450 Q 400 280, 800 450 T 1700 450'/%3E%3Cpath d='M-100 480 Q 400 310, 800 480 T 1700 480'/%3E%3Cpath d='M-100 510 Q 400 340, 800 510 T 1700 510'/%3E%3Cpath d='M-100 540 Q 400 370, 800 540 T 1700 540'/%3E%3Cpath d='M-100 570 Q 400 400, 800 570 T 1700 570'/%3E%3Cpath d='M-100 600 Q 400 430, 800 600 T 1700 600'/%3E%3Cpath d='M-100 630 Q 400 460, 800 630 T 1700 630'/%3E%3Cpath d='M-100 390 Q 400 590, 800 390 T 1700 390'/%3E%3Cpath d='M-100 360 Q 400 560, 800 360 T 1700 360'/%3E%3Cpath d='M-100 330 Q 400 530, 800 330 T 1700 330'/%3E%3Cpath d='M-100 300 Q 400 500, 800 300 T 1700 300'/%3E%3Cpath d='M-100 270 Q 400 470, 800 270 T 1700 270'/%3E%3Ccircle cx='800' cy='450' r='260' stroke-dasharray='4 9'/%3E%3Ccircle cx='800' cy='450' r='360' stroke-dasharray='1 11'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: cover, cover;
+  background-position: center, center;
+  background-repeat: no-repeat, no-repeat;
+  backdrop-filter: blur(28px);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  opacity: 1;
+  pointer-events: none;
+  transform: translateY(100%);
+  transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+  overflow: hidden;
+}
+body.light-mode .fullscreen-curtain {
+  background-image:
+    radial-gradient(ellipse at 85% 45%, rgba(150, 116, 51, 0.05), transparent 60%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1600' height='900' viewBox='0 0 1600 900'%3E%3Cg fill='none' stroke='%2364748b' stroke-width='1' stroke-opacity='0.20'%3E%3Cpath d='M-100 420 Q 400 250, 800 420 T 1700 420'/%3E%3Cpath d='M-100 450 Q 400 280, 800 450 T 1700 450'/%3E%3Cpath d='M-100 480 Q 400 310, 800 480 T 1700 480'/%3E%3Cpath d='M-100 510 Q 400 340, 800 510 T 1700 510'/%3E%3Cpath d='M-100 540 Q 400 370, 800 540 T 1700 540'/%3E%3Cpath d='M-100 570 Q 400 400, 800 570 T 1700 570'/%3E%3Cpath d='M-100 600 Q 400 430, 800 600 T 1700 600'/%3E%3Cpath d='M-100 630 Q 400 460, 800 630 T 1700 630'/%3E%3Cpath d='M-100 390 Q 400 590, 800 390 T 1700 390'/%3E%3Cpath d='M-100 360 Q 400 560, 800 360 T 1700 360'/%3E%3Cpath d='M-100 330 Q 400 530, 800 330 T 1700 330'/%3E%3Cpath d='M-100 300 Q 400 500, 800 300 T 1700 300'/%3E%3Cpath d='M-100 270 Q 400 470, 800 270 T 1700 270'/%3E%3Ccircle cx='800' cy='450' r='260' stroke-dasharray='4 9'/%3E%3Ccircle cx='800' cy='450' r='360' stroke-dasharray='1 11'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: cover, cover;
+  background-repeat: no-repeat, no-repeat;
+}
+.fullscreen-curtain.open {
+  transform: translateY(0);
+  pointer-events: auto;
+}
+.curtain-topbar {
+  flex-shrink: 0;
+  padding: 1.1rem 2.5rem;
+  border-bottom: 1px solid var(--k-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: transparent;
+}
+.curtain-topbar .curtain-close-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid var(--k-border);
+  color: var(--k-text-muted);
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  padding: 0.6rem 1.4rem;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.25s ease;
+}
+.curtain-topbar .curtain-close-btn:hover {
+  border-color: var(--k-gold);
+  color: var(--k-text);
+  background: rgba(197, 160, 89, 0.12);
+}
+
+/* 2-Column Curtain: Left side empty, options on the EXTREME RIGHT */
+.curtain-split-container {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr minmax(280px, 42%);
+  gap: 2rem;
+  align-items: start;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 1.5rem 2.5rem 2.5rem;
+  box-sizing: border-box;
+  -webkit-overflow-scrolling: touch;
+}
+
+.curtain-empty-stage {
+  height: 100%;
+  pointer-events: none;
+}
+
+.curtain-options-column {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  width: 100%;
+  margin-left: auto;
+  padding-right: 0.5rem;
+  padding-bottom: 2rem;
+}
+
+.curtain-nav-list {
+  list-style: none;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+.curtain-nav-item {
+  margin-bottom: 0.65rem;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1), transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+}
+.fullscreen-curtain.open .curtain-nav-item {
+  opacity: 1;
+  transform: translateY(0);
+}
+.fullscreen-curtain.open .curtain-nav-item:nth-child(1) { transition-delay: 0.04s; }
+.fullscreen-curtain.open .curtain-nav-item:nth-child(2) { transition-delay: 0.07s; }
+.fullscreen-curtain.open .curtain-nav-item:nth-child(3) { transition-delay: 0.10s; }
+.fullscreen-curtain.open .curtain-nav-item:nth-child(4) { transition-delay: 0.13s; }
+.fullscreen-curtain.open .curtain-nav-item:nth-child(5) { transition-delay: 0.16s; }
+.fullscreen-curtain.open .curtain-nav-item:nth-child(6) { transition-delay: 0.19s; }
+.fullscreen-curtain.open .curtain-nav-item:nth-child(7) { transition-delay: 0.22s; }
+.fullscreen-curtain.open .curtain-nav-item:nth-child(8) { transition-delay: 0.25s; }
+.fullscreen-curtain.open .curtain-nav-item:nth-child(9) { transition-delay: 0.28s; }
+.fullscreen-curtain.open .curtain-nav-item:nth-child(10) { transition-delay: 0.31s; }
+.fullscreen-curtain.open .curtain-nav-item:nth-child(11) { transition-delay: 0.34s; }
+.fullscreen-curtain.open .curtain-nav-item:nth-child(12) { transition-delay: 0.37s; }
+.fullscreen-curtain.open .curtain-nav-item:nth-child(13) { transition-delay: 0.40s; }
+.fullscreen-curtain.open .curtain-nav-item:nth-child(14) { transition-delay: 0.43s; }
+.fullscreen-curtain.open .curtain-nav-item:nth-child(15) { transition-delay: 0.46s; }
+.fullscreen-curtain.open .curtain-nav-item:nth-child(16) { transition-delay: 0.49s; }
+.fullscreen-curtain.open .curtain-nav-item:nth-child(17) { transition-delay: 0.52s; }
+
+.curtain-nav-link {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: 1rem;
+  text-align: right;
+  padding: 3px 0;
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 0.3s ease,
+              color 0.3s ease;
+  font-size: 0.95em;
+}
+.curtain-nav-link span.num {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.85rem;
+  letter-spacing: 0.18em;
+  color: var(--k-gold);
+  font-weight: 700;
+}
+
+.curtain-nav-list:hover .curtain-nav-link {
+  opacity: 0.32;
+  filter: blur(0.3px);
+}
+.curtain-nav-list .curtain-nav-link:hover {
+  opacity: 1;
+  filter: blur(0px);
+  transform: translateX(-10px);
+}
+.curtain-nav-link:hover span[class*="font-opt-"] {
+  color: #ffffff;
+  text-shadow: 0 0 20px rgba(197, 160, 89, 0.55);
+}
+
+.curtain-nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 0;
+  height: 1.5px;
+  background: var(--k-gold);
+  transition: width 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.curtain-nav-link:hover::after {
+  width: 100%;
+}
+
+.font-opt-primary {
+  font-family: 'Cinzel', serif;
+  font-size: 1.28rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--k-text);
+}
+.font-opt-serif {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.35rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--k-text);
+}
+.font-opt-sans {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 1.2rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--k-text-silver);
+}
+.font-opt-accent {
+  font-family: 'Cinzel', serif;
+  font-size: 1.28rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--k-gold);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   HERO: IMAGE RATIO & 3D BOOK-PAGE LEAF TRANSITION ENGINE
+   ───────────────────────────────────────────────────────────── */
+.hero-minimal {
+  flex: 1;
+  display: flex;
+  align-items: stretch;
+  position: relative;
+  padding: 0;
+  max-width: none;
+  width: 100%;
+  margin: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.hero-layout {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  align-items: center;
+  min-height: 100vh;
+  min-height: 100dvh;
+  gap: 2.5rem;
+  padding: 5.5rem 2.75rem 2rem;
+  box-sizing: border-box;
+}
+
+.geometric-stage {
+  position: relative;
+  width: 100%;
+  height: calc(100vh - 4rem);
+  height: calc(100dvh - 4rem);
+  min-height: 480px;
+  max-height: 820px;
+  display: flex;
+  align-items: stretch;
+  margin-top: 0;
+}
+.geometric-frame {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.geometric-clip-box {
+  position: absolute;
+  inset: 0;
+  clip-path: polygon(6% 0%, 88% 0%, 100% 50%, 88% 100%, 6% 100%, 0% 50%);
+  background: var(--bg-deep);
+  overflow: hidden;
+}
+
+.hero-slide-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  opacity: 0;
+  z-index: 0;
+  transform: scale(1.02);
+  transition: opacity 2.4s cubic-bezier(0.4, 0, 0.2, 1), transform 11s cubic-bezier(0.1, 0.8, 0.3, 1);
+  filter: contrast(106%) brightness(92%);
+  will-change: opacity, transform;
+  pointer-events: none;
+}
+
+.hero-slide-img.active {
+  opacity: 1;
+  z-index: 2;
+  transform: scale(1.07);
+}
+
+.hero-slide-img.prev-active {
+  opacity: 1;
+  z-index: 1;
+  transform: scale(1.07);
+  transition: none;
+}
+
+.geometric-vignette {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(2, 4, 8, 0.25) 0%, transparent 60%, rgba(2, 4, 8, 0.6) 100%);
+  pointer-events: none;
+  z-index: 5;
+}
+
+body.light-mode .geometric-vignette {
+  background: linear-gradient(90deg, rgba(248, 250, 252, 0.2) 0%, transparent 60%, rgba(248, 250, 252, 0.5) 100%);
+}
+
+.geometric-border-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 10;
+}
+.geometric-border-overlay polygon {
+  fill: none;
+  stroke: var(--k-gold);
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+  opacity: 0.75;
+}
+
+.hero-editorial-panel {
+  padding-right: 2rem;
+  padding-left: 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  text-align: center;
+}
+
+.quote-book-stage {
+  position: relative;
+  width: 100%;
+  min-height: 280px;
+  perspective: 1400px;
+  perspective-origin: 50% 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.quote-page {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  transform-origin: center center;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transform: rotateY(55deg) translateZ(0);
+  transition: transform 1.25s cubic-bezier(0.25, 1, 0.4, 1), 
+              opacity 0.95s cubic-bezier(0.25, 1, 0.4, 1), 
+              filter 1.25s ease;
+  filter: blur(1px) brightness(0.6);
+  will-change: transform, opacity;
+}
+
+.quote-page::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, var(--page-shadow), transparent 35%);
+  opacity: 0;
+  transition: opacity 1.2s ease;
+  pointer-events: none;
+}
+
+.quote-page.active {
+  opacity: 1;
+  pointer-events: auto;
+  transform: rotateY(0deg) translateZ(0);
+  filter: blur(0px) brightness(1);
+  z-index: 5;
+}
+.quote-page.active::after {
+  opacity: 0;
+}
+
+.quote-page.flipped-forward {
+  opacity: 0;
+  transform: rotateY(-85deg) translateZ(0);
+  filter: blur(2px) brightness(0.3);
+  z-index: 1;
+}
+.quote-page.flipped-forward::after {
+  opacity: 1;
+}
+
+.quote-page.incoming-forward {
+  opacity: 0;
+  transform: rotateY(55deg) translateZ(0);
+  filter: blur(2px) brightness(0.5);
+  transition: none !important;
+  z-index: 4;
+}
+
+.quote-page.flipped-backward {
+  opacity: 0;
+  transform: rotateY(85deg) translateZ(0);
+  filter: blur(2px) brightness(0.3);
+  z-index: 1;
+}
+.quote-page.incoming-backward {
+  opacity: 0;
+  transform: rotateY(-55deg) translateZ(0);
+  filter: blur(2px) brightness(0.5);
+  transition: none !important;
+  z-index: 4;
+}
+
+.gold-category-label {
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  font-size: 0.6rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--k-gold);
+  font-weight: 600;
+  display: block;
+  margin-bottom: 0.75rem;
+  text-align: center;
+}
+
+.hero-serif-headline {
+  font-family: 'Playfair Display', 'Georgia', 'Times New Roman', serif;
+  font-size: clamp(1.2rem, 1.85vw, 1.55rem);
+  line-height: 1.38;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  color: var(--k-text);
+  margin-bottom: 0.85rem;
+  text-align: center;
+  max-width: 22em;
+  margin-left: auto;
+  margin-right: auto;
+}
+.hero-serif-headline em {
+  font-style: italic;
+  font-weight: 400;
+  background: linear-gradient(135deg, var(--k-text) 15%, var(--k-gold-light) 70%, var(--k-gold) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hero-description {
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 0.88rem;
+  line-height: 1.65;
+  font-weight: 400;
+  color: var(--k-text-silver);
+  max-width: 28em;
+  letter-spacing: 0.01em;
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.hero-navigation-row {
+  display: flex;
+  align-items: center;
+  gap: 2.4rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--k-border);
+}
+
+.slide-number-display {
+  font-family: 'Cinzel', serif;
+  font-size: 1.15rem;
+  letter-spacing: 0.12em;
+  color: var(--k-text);
+}
+.slide-number-display span.dim {
+  color: var(--k-text-dim);
+  font-size: 0.82rem;
+}
+
+.circular-arrows-group {
+  display: flex;
+  gap: 12px;
+}
+.btn-circle-arrow {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1px solid var(--k-border);
+  background: transparent;
+  color: var(--k-text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+.btn-circle-arrow svg {
+  width: 15px;
+  height: 15px;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  fill: none;
+  transition: transform 0.2s ease;
+}
+.btn-circle-arrow:hover {
+  border-color: var(--k-gold);
+  color: var(--k-gold-light);
+  background: rgba(197, 160, 89, 0.08);
+}
+.btn-circle-arrow:hover svg {
+  transform: scale(1.08);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   BOTTOM NOTICES, CIRCULARS & ORDERS DOCK TOGGLE
+   ───────────────────────────────────────────────────────────── */
+.news-dock-strip {
+  background: var(--dock-bg);
+  border-top: 1px solid var(--k-border);
+  border-bottom: 1px solid var(--k-border);
+  padding: 0.75rem 3.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: background-color 0.25s ease, border-color 0.25s ease;
+  z-index: 100;
+}
+.news-dock-strip:hover {
+  background: var(--dock-hover);
+  border-color: var(--k-gold-hairline);
+}
+.news-dock-left {
+  display: flex;
+  align-items: center;
+  gap: 1.4rem;
+  overflow: hidden;
+}
+.news-live-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 9px;
+  background: rgba(197, 160, 89, 0.12);
+  border: 1px solid var(--k-gold-hairline);
+  color: var(--k-gold);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 700;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+.news-preview-headline {
+  font-size: 0.8rem;
+  color: var(--k-text-silver);
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.news-preview-headline strong {
+  color: var(--k-text);
+  margin-right: 6px;
+}
+.news-dock-action {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--k-gold);
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.news-chevron-icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1px solid var(--k-gold-hairline);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.25s ease;
+}
+.news-dock-strip:hover .news-chevron-icon {
+  transform: translateY(-2px);
+  background: var(--k-gold);
+  color: #fff;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   FULLSCREEN GAZETTE PORTAL (ORDERS, NOTICES & ARTICLES)
+   ───────────────────────────────────────────────────────────── */
+.news-dramatic-portal {
+  position: fixed;
+  inset: 0;
+  background: var(--k-curtain-bg);
+  backdrop-filter: blur(32px);
+  z-index: 1200;
+  display: flex;
+  flex-direction: column;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(100%);
+  transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.45s ease;
+}
+.news-dramatic-portal.open {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+.gazette-header {
+  padding: 1.5rem 3.5rem;
+  border-bottom: 1px solid var(--k-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--header-bg);
+}
+.gazette-body {
+  flex: 1;
+  max-width: 1600px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 3.5rem;
+  overflow-y: auto;
+}
+
+.gazette-filter-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 2.5rem;
+  border-bottom: 1px solid var(--k-border);
+  padding-bottom: 1.2rem;
+  flex-wrap: wrap;
+}
+.gazette-tab-btn {
+  background: transparent;
+  border: 1px solid var(--k-border);
+  color: var(--k-text-muted);
+  font-size: 0.72rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 0.55rem 1.3rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.gazette-tab-btn.active, .gazette-tab-btn:hover {
+  border-color: var(--k-gold);
+  color: var(--k-text);
+  background: rgba(197, 160, 89, 0.1);
+}
+
+.gazette-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+}
+.gazette-card {
+  background: var(--k-panel);
+  border: 1px solid var(--k-border);
+  padding: 2.2rem;
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 250px;
+  transition: transform 0.3s ease, border-color 0.3s ease;
+}
+.gazette-card:hover {
+  transform: translateY(-6px);
+  border-color: var(--k-gold-hairline);
+}
+.gazette-meta-tag {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.68rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--k-gold);
+  margin-bottom: 1rem;
+}
+.gazette-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.3rem;
+  line-height: 1.3;
+  color: var(--k-text);
+  margin-bottom: 0.8rem;
+}
+.gazette-snippet {
+  font-size: 0.84rem;
+  color: var(--k-text-muted);
+  line-height: 1.6;
+}
+.gazette-action-link {
+  margin-top: 1.6rem;
+  font-size: 0.74rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--k-gold);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   DEPARTMENTAL AUTHENTICATION MODAL
+   ───────────────────────────────────────────────────────────── */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(2, 4, 8, 0.92);
+  backdrop-filter: blur(16px);
+  z-index: 2000;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+.modal-card {
+  background: var(--k-panel);
+  border: 1px solid var(--k-gold-hairline);
+  max-width: 480px;
+  width: 100%;
+  padding: 2.8rem;
+  position: relative;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.85);
+}
+.modal-close-btn {
+  position: absolute;
+  top: 1.2rem;
+  right: 1.2rem;
+  background: transparent;
+  border: none;
+  color: var(--k-text-muted);
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+.field-item {
+  margin-bottom: 1.4rem;
+}
+.field-item label {
+  display: block;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--k-gold);
+  margin-bottom: 0.4rem;
+  font-weight: 600;
+}
+.field-item select, .field-item input {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  background: var(--bg-black);
+  border: 1px solid var(--k-border);
+  color: var(--k-text);
+  outline: none;
+  font-size: 0.9rem;
+}
+.field-item select:focus, .field-item input:focus {
+  border-color: var(--k-gold);
+}
+.btn-modal-action {
+  background: linear-gradient(135deg, var(--k-gold), #967433);
+  border: none;
+  color: #fff;
+  padding: 0.95rem 1.6rem;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 0.6rem;
+  transition: opacity 0.2s ease;
+}
+.btn-modal-action:hover {
+  opacity: 0.92;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   DEVELOPER MODAL
+   ───────────────────────────────────────────────────────────── */
+.dev-modal-card {
+  text-align: center;
+}
+.dev-avatar {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--k-gold), var(--k-gold-light));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  margin: 0 auto 16px;
+  color: #070b14;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   MINIMAL FOOTER
+   ───────────────────────────────────────────────────────────── */
+footer.site-footer {
+  background: var(--topbar-bg);
+  padding: 1.6rem 3.5rem;
+  font-size: 0.72rem;
+  color: var(--k-text-dim);
+  border-top: 1px solid var(--k-border);
+}
+.footer-inner {
+  max-width: 1600px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+@media (max-width: 1024px) {
+  .topbar, header.site-header, footer.site-footer, .news-dock-strip {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+  .hero-layout {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+  .geometric-stage {
+    height: min(48vh, 420px);
+    min-height: 300px;
+  }
+  .geometric-clip-box {
+    clip-path: polygon(4% 0%, 92% 0%, 100% 50%, 92% 100%, 4% 100%, 0% 50%);
+  }
+  .hero-editorial-panel {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+  .quote-book-stage {
+    min-height: 280px;
+  }
+  .hero-serif-headline {
+    font-size: 1.4rem;
+  }
+  .curtain-split-container {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+    padding: 2rem 1.5rem;
+  }
+  .curtain-empty-stage {
+    display: none;
+  }
+  .gazette-cards-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── PWA Install button (fixed bottom-right, always on browser view) ── */
+.pwa-install-btn {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  position: fixed;
+  bottom: 22px;
+  right: 22px;
+  z-index: 99990;
+  background: #010307;
+  border: 1.5px solid var(--k-gold, #c5a059);
+  color: var(--k-gold-light, #e5cb93);
+  border-radius: 14px;
+  padding: 11px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.45);
+  transition: background 0.2s, color 0.2s, transform 0.2s, box-shadow 0.2s;
+  letter-spacing: 0.02em;
+}
+.pwa-install-btn.visible {
+  display: inline-flex;
+}
+.pwa-install-btn:hover {
+  background: var(--k-gold, #c5a059);
+  color: #020408;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 32px rgba(197,160,89,0.35);
+}
+.pwa-install-btn svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+body.light-mode .pwa-install-btn {
+  background: #ffffff;
+  color: #0a1f3d;
+  border-color: #c5a059;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+}
+body.light-mode .pwa-install-btn:hover {
+  background: #c5a059;
+  color: #020408;
+}
+@media (display-mode: standalone), (display-mode: fullscreen) {
+  .pwa-install-btn { display: none !important; }
+}
+html.app-mode .pwa-install-btn { display: none !important; }
+@media (max-width: 640px) {
+  .pwa-install-btn {
+    bottom: 18px;
+    right: 14px;
+    padding: 10px 14px;
+    font-size: 12px;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   APP MODE (installed PWA) — classic mobile home ONLY
+   ═══════════════════════════════════════════════════════════ */
+html.app-mode,
+html.app-mode body {
+  background: #f4f6f9 !important;
+  color: #1e293b !important;
+  overflow-x: hidden;
+}
+
+html.app-mode .topbar,
+html.app-mode header.site-header,
+html.app-mode .site-header,
+html.app-mode .fullscreen-curtain,
+html.app-mode main.hero-minimal,
+html.app-mode .hero-minimal,
+html.app-mode .hero-layout,
+html.app-mode .geometric-stage,
+html.app-mode .hero-editorial-panel,
+html.app-mode #editorialPanel,
+html.app-mode .news-dock-strip,
+html.app-mode footer.site-footer,
+html.app-mode .site-footer,
+html.app-mode .pwa-install-btn,
+html.app-mode .btn-menu-trigger,
+html.app-mode .menu-label {
+  display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  overflow: hidden !important;
+  pointer-events: none !important;
+}
+
+.app-topbar,
+.app-home,
+.app-tabbar {
+  display: none;
+}
+html.app-mode .app-topbar {
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 500;
+  background: #0B2545 !important;
+  padding: 10px 14px;
+  padding-top: max(10px, env(safe-area-inset-top));
+  box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+}
+html.app-mode .app-topbar .at-brand {
+  display: flex; align-items: center; gap: 10px; min-width: 0;
+}
+html.app-mode .app-topbar .at-brand img {
+  width: 36px; height: 36px; border-radius: 50%; object-fit: cover;
+  box-shadow: 0 0 0 2px rgba(201,162,74,0.55);
+}
+html.app-mode .app-topbar .at-brand span {
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-weight: 700; font-size: 16px; color: #E8C96A; white-space: nowrap;
+}
+html.app-mode .app-topbar .at-actions { display: flex; gap: 6px; }
+html.app-mode .app-topbar .at-actions a,
+html.app-mode .app-topbar .at-actions button {
+  width: 34px; height: 34px; border-radius: 16px;
+  background: rgba(201,162,74,0.12);
+  border: 1px solid rgba(201,162,74,0.35);
+  color: #E8C96A;
+  display: flex; align-items: center; justify-content: center;
+  text-decoration: none; cursor: pointer; padding: 0;
+}
+html.app-mode .app-topbar .at-actions svg {
+  width: 17px; height: 17px; stroke: currentColor; fill: none; stroke-width: 2.2;
+}
+
+html.app-mode .app-home {
+  display: block !important;
+  padding: 18px 16px 100px;
+  max-width: 560px;
+  margin: 0 auto;
+  min-height: 100vh;
+  box-sizing: border-box;
+  background: #f4f6f9;
+}
+html.app-mode .app-home-greeting {
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 22px; font-weight: 700; color: #0f172a; margin-bottom: 4px;
+}
+html.app-mode .app-home-greeting span {
+  display: block; font-size: 11px; font-weight: 600; color: #C9A84C;
+  letter-spacing: 1.4px; text-transform: uppercase; margin-bottom: 4px;
+}
+html.app-mode .app-home-stats {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 16px 0 12px;
+}
+html.app-mode .app-home-stats .tile {
+  background: #fff; border-radius: 16px; padding: 12px 6px; text-align: center;
+  box-shadow: 0 2px 10px rgba(15,23,42,0.06); border: 1px solid rgba(15,23,42,0.04);
+}
+html.app-mode .app-home-stats .tile b {
+  display: block; font-size: 18px; font-weight: 700; color: #C9A84C;
+}
+html.app-mode .app-home-stats .tile small {
+  display: block; font-size: 9px; color: #64748b; text-transform: uppercase;
+  letter-spacing: 0.4px; margin-top: 2px; font-weight: 600;
+}
+html.app-mode .app-home-alert {
+  display: none; background: #fef2f2; color: #991b1b; border-radius: 999px;
+  padding: 10px 14px; font-size: 13px; font-weight: 600; margin: 8px 0 16px;
+  align-items: center; gap: 8px;
+}
+html.app-mode .app-home-alert.is-visible { display: flex !important; }
+html.app-mode .app-home-section-label {
+  font-size: 11px; font-weight: 700; letter-spacing: 1.2px;
+  text-transform: uppercase; color: #94a3b8; margin: 8px 0 12px;
+}
+html.app-mode .app-home-actions {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px 10px;
+}
+html.app-mode .app-home-actions a {
+  display: flex; flex-direction: column; align-items: center; gap: 7px;
+  text-decoration: none; color: #334155; font-size: 11px; font-weight: 700; text-align: center;
+}
+html.app-mode .app-home-actions a .ic {
+  width: 52px; height: 52px; border-radius: 16px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; box-shadow: 0 8px 18px rgba(0,0,0,0.12); color: #fff;
+}
+html.app-mode .app-home-actions a:nth-child(1)  .ic { background: linear-gradient(145deg,#5b7bab,#0B2545 70%); }
+html.app-mode .app-home-actions a:nth-child(2)  .ic { background: linear-gradient(145deg,#E0C083,#C6A358 65%); }
+html.app-mode .app-home-actions a:nth-child(3)  .ic { background: linear-gradient(145deg,#ff9a6c,#d9622a 70%); }
+html.app-mode .app-home-actions a:nth-child(4)  .ic { background: linear-gradient(145deg,#4fd8c9,#177a70 70%); }
+html.app-mode .app-home-actions a:nth-child(5)  .ic { background: linear-gradient(145deg,#b09bfa,#6d28d9 70%); }
+html.app-mode .app-home-actions a:nth-child(6)  .ic { background: linear-gradient(145deg,#f18a8a,#a11d1d 70%); }
+html.app-mode .app-home-actions a:nth-child(7)  .ic { background: linear-gradient(145deg,#7de3b3,#1E6B45 70%); }
+html.app-mode .app-home-actions a:nth-child(8)  .ic { background: linear-gradient(145deg,#ffe08a,#c9861a 70%); }
+html.app-mode .app-home-actions a:nth-child(9)  .ic { background: linear-gradient(145deg,#97a3f7,#3730a3 70%); }
+html.app-mode .app-home-actions a:nth-child(10) .ic { background: linear-gradient(145deg,#f472b6,#be185d 70%); }
+html.app-mode .app-home-actions a:nth-child(11) .ic { background: linear-gradient(145deg,#64748b,#1e293b 70%); }
+html.app-mode .app-home-actions a:nth-child(12) .ic { background: linear-gradient(145deg,#60a5fa,#1d4ed8 70%); }
+
+html.app-mode .app-tabbar {
+  display: flex !important;
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 600;
+  background: #0B2545 !important;
+  border-top: 2px solid #C9A84C;
+  padding: 6px 4px max(8px, env(safe-area-inset-bottom));
+  justify-content: space-around; align-items: center;
+}
+html.app-mode .app-tabbar a {
+  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px;
+  text-decoration: none; color: rgba(255,255,255,0.55);
+  font-size: 10px; font-weight: 600; padding: 4px 0;
+}
+html.app-mode .app-tabbar a svg {
+  width: 24px; height: 24px; stroke: currentColor; fill: none; stroke-width: 2;
+}
+html.app-mode .app-tabbar a.active { color: #E8C96A; }
+html.app-mode .app-tabbar a.active svg { stroke: #E8C96A; }
+
+@media (display-mode: standalone), (display-mode: fullscreen) {
+  .topbar,
+  header.site-header,
+  .fullscreen-curtain,
+  main.hero-minimal,
+  .hero-minimal,
+  .news-dock-strip,
+  footer.site-footer,
+  .pwa-install-btn {
+    display: none !important;
+  }
+  .app-topbar {
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 500;
+    background: #0B2545 !important;
+    padding: 10px 14px;
+    padding-top: max(10px, env(safe-area-inset-top));
+  }
+  .app-home {
+    display: block !important;
+    padding: 18px 16px 100px;
+    max-width: 560px;
+    margin: 0 auto;
+    background: #f4f6f9;
+    min-height: 100vh;
+  }
+  .app-tabbar {
+    display: flex !important;
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    z-index: 600;
+    background: #0B2545 !important;
+    border-top: 2px solid #C9A84C;
+    padding: 6px 4px max(8px, env(safe-area-inset-bottom));
+    justify-content: space-around;
+  }
+  body { background: #f4f6f9 !important; }
+}
+
+/* Simple bottom arrow → Latest Orders */
+.orders-arrow-link {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 900;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 1px solid var(--k-gold-hairline, rgba(197,160,89,0.45));
+  background: rgba(2, 4, 8, 0.72);
+  color: var(--k-gold, #c5a059);
+  text-decoration: none;
+  backdrop-filter: blur(10px);
+  transition: transform 0.25s ease, background 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+}
+.orders-arrow-link:hover {
+  transform: translateX(-50%) translateY(-3px);
+  background: var(--k-gold, #c5a059);
+  color: #020408;
+  border-color: var(--k-gold, #c5a059);
+}
+.orders-arrow-link:focus-visible {
+  outline: 2px solid var(--k-gold, #c5a059);
+  outline-offset: 3px;
+}
+html.app-mode .orders-arrow-link {
+  display: none !important;
+}
+@media (display-mode: standalone), (display-mode: fullscreen) {
+  .orders-arrow-link { display: none !important; }
+}
+
+/* When menu is open: avoid double header */
+html.menu-open header.site-header .brand-lockup {
+  opacity: 0;
+  pointer-events: none;
+}
+html.menu-open header.site-header {
+  background: transparent;
+  border-bottom: none;
+}
+</style>
+</head>
+<body>
+<script>DLO.injectMenu();</script>
+
+<!-- ═══ APP SHELL (visible only when installed as PWA) ═══ -->
+<div class="app-topbar" id="appTopbar" aria-hidden="true">
+  <div class="at-brand">
+    <img src="logo.png" alt="DLO Kupwara" onerror="this.style.display='none'">
+    <span>DLO Kupwara</span>
+  </div>
+  <div class="at-actions">
+    <a href="search-filter-cases.html" title="Search cases" aria-label="Search">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+    </a>
+    <a href="latest-updates.html" title="Updates" aria-label="Updates">
+      <svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 01-3.4 0"/></svg>
+    </a>
+    <button type="button" onclick="if(typeof openDeveloperModal==='function')openDeveloperModal();" title="About" aria-label="About">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><circle cx="12" cy="8" r="0.5" fill="currentColor"/></svg>
+    </button>
+  </div>
+</div>
+
+<div class="app-home" id="appHome" aria-hidden="true">
+  <div class="app-home-greeting">
+    <span>District Litigation Office</span>
+    Welcome back
+  </div>
+
+  <div class="app-home-stats">
+    <div class="tile"><b id="appHomeTotal">—</b><small>Total</small></div>
+    <div class="tile"><b id="appHomeActive">—</b><small>Active</small></div>
+    <div class="tile"><b id="appHomeCourts">13+</b><small>Courts</small></div>
+    <div class="tile"><b id="appHomeDisposed">—</b><small>Disposed</small></div>
+    <div class="tile"><b id="appHomeReplyFiled">—</b><small>Reply Filed</small></div>
+    <div class="tile"><b id="appHomeReplyPending">—</b><small>Reply Pending</small></div>
+    <div class="tile"><b id="appHomeExparte">—</b><small>Ex-parte</small></div>
+  </div>
+
+  <div class="app-home-alert" id="appHomeAlert">
+    <span aria-hidden="true">⚠️</span>
+    <span id="appHomeAlertText"></span>
+  </div>
+
+  <div class="app-home-section-label">Quick Access</div>
+  <div class="app-home-actions">
+    <a href="about-office.html"><div class="ic">🏛️</div>About</a>
+    <a href="search-filter-cases.html"><div class="ic">📁</div>My Cases</a>
+    <a href="hearings.html"><div class="ic">📅</div>Hearings</a>
+    <a href="court-wise-distribution.html"><div class="ic">⚖️</div>Courts</a>
+    <a href="analytics.html"><div class="ic">📊</div>Analytics</a>
+    <a href="causelist.html"><div class="ic">📋</div>Cause List</a>
+    <a href="latest-updates.html"><div class="ic">🔔</div>Updates</a>
+    <a href="performance.html"><div class="ic">⭐</div>Performance</a>
+    <a href="history.html"><div class="ic">📖</div>Case History</a>
+    <a href="our-officials.html"><div class="ic">👥</div>Team</a>
+    <a href="operator.html"><div class="ic">🔐</div>Staff Login</a>
+    <a href="contact.html"><div class="ic">✉️</div>Contact</a>
+  </div>
+</div>
+
+<nav class="app-tabbar" id="appTabbar" aria-label="App navigation" aria-hidden="true">
+  <a href="index.html" class="active">
+    <svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
+    Home
+  </a>
+  <a href="search-filter-cases.html">
+    <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+    Cases
+  </a>
+  <a href="hearings.html">
+    <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>
+    Hearings
+  </a>
+  <a href="history.html">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2"/></svg>
+    History
+  </a>
+  <a href="contact.html">
+    <svg viewBox="0 0 24 24"><path d="M4 4h16v12H7l-3 3z"/></svg>
+    Contact
+  </a>
+</nav>
+<!-- ═══ END APP SHELL ═══ -->
+
+<!-- TOP INSTITUTIONAL STRIP -->
+<div class="topbar">
+  <span>Government of Jammu &amp; Kashmir &nbsp;|&nbsp; Department of Law, Justice &amp; Parliamentary Affairs</span>
+  <div style="display:flex; align-items:center; gap: 1.5rem;">
+    <span>Kupwara District Jurisdiction</span>
+  </div>
+</div>
+
+<!-- HEADER (Wordmark, Black Half-Moon Theme Button & Dramatic 3-Bar Menu Trigger) -->
+<header class="site-header">
+  <div class="header-inner">
+    <a href="index.html" class="brand-lockup">
+      <img src="emblem.png" alt="Emblem of Jammu &amp; Kashmir" class="brand-emblem" onerror="this.style.display='none'">
+      <div class="brand-text">
+        <h1>District Litigation Office Kupwara</h1>
+        <p>Department of Law, Justice and PA</p>
+      </div>
+    </a>
+  </div>
+</header>
+
+<!-- HERO: ARCHITECTURAL PHOTO SHOWCASE & 3D BOOK-PAGE QUOTE ROTATOR -->
+<main class="hero-minimal">
+  <div class="hero-layout">
+    
+    <!-- LEFT: Geometric Hexagon Frame with Hairline Gold Border -->
+    <div class="geometric-stage">
+      <div class="geometric-frame">
+        <div class="geometric-clip-box">
+          <img src="assets/images/hero/building-1.jpg" alt="DC Office Complex Kupwara" class="hero-slide-img active" onerror="this.onerror=null; this.src='assets/images/hero-entrance.jpg';" />
+          <img src="assets/images/hero/building-2.jpg" alt="Administrative Wing Kupwara" class="hero-slide-img" onerror="this.onerror=null; this.src='assets/images/hero-entrance.jpg';" />
+          <img src="assets/images/hero/office-entrance.jpg" alt="District Litigation Office Signage" class="hero-slide-img" onerror="this.onerror=null; this.src='assets/images/signage-detail.jpg';" />
+          <img src="assets/images/hero/office-interior-1.jpg" alt="Litigation Registry & Verification Desk" class="hero-slide-img" onerror="this.onerror=null; this.src='assets/images/hero-entrance.jpg';" />
+          <img src="assets/images/hero/office-interior-2.jpg" alt="Executive Legal Consultation Chamber" class="hero-slide-img" onerror="this.onerror=null; this.src='assets/images/signage-detail.jpg';" />
+          <img src="assets/images/hero/law-library.jpg" alt="Law Library & Legal Reference Archive" class="hero-slide-img" onerror="this.onerror=null; this.src='assets/images/hero-entrance.jpg';" />
+          <img src="assets/images/hero/staff-1.jpg" alt="Administrative Legal Staff" class="hero-slide-img" onerror="this.onerror=null; this.src='assets/images/signage-detail.jpg';" />
+          <img src="assets/images/hero/staff-2.jpg" alt="Litigation Coordination Team" class="hero-slide-img" onerror="this.onerror=null; this.src='assets/images/hero-entrance.jpg';" />
+          
+          <div class="geometric-vignette"></div>
+        </div>
+
+        <svg class="geometric-border-overlay" viewBox="0 0 100 100" preserveAspectRatio="none">
+          <polygon points="6,0 88,0 100,50 88,100 6,100 0,50" />
+        </svg>
+      </div>
+    </div>
+
+    <!-- RIGHT: 3D BOOK-PAGE QUOTE STAGE -->
+    <div class="hero-editorial-panel" id="editorialPanel">
+      <div class="quote-book-stage" id="quoteBookStage">
+        
+        <div class="quote-page active" data-page="0">
+          <span class="gold-category-label">Department of Law, Justice and PA</span>
+          <h2 class="hero-serif-headline">Strategic State Representation with <em>Institutional Precision</em>.</h2>
+          <p class="hero-description">Safeguarding government interest and directing statutory compliance across 12 designated judicial forums in Kupwara district.</p>
+        </div>
+
+        <div class="quote-page" data-page="1">
+          <span class="gold-category-label">DC Office Complex · Kupwara</span>
+          <h2 class="hero-serif-headline">Administrative Vigilance &amp; <em>Judicial Coordination</em>.</h2>
+          <p class="hero-description">Coordinating timely government defense, objections, and legal representation from district headquarters.</p>
+        </div>
+
+        <div class="quote-page" data-page="2">
+          <span class="gold-category-label">Administrative Registry · Kupwara</span>
+          <h2 class="hero-serif-headline">Rigorous Scrutiny &amp; <em>Timely Compliance</em>.</h2>
+          <p class="hero-description">Ensuring government objections, parawise replies, and compliance reports are thoroughly vetted prior to listed hearings.</p>
+        </div>
+
+        <div class="quote-page" data-page="3">
+          <span class="gold-category-label">Litigation Scrutiny Registry</span>
+          <h2 class="hero-serif-headline">Deliberate Strategy &amp; <em>Pleading Scrutiny</em>.</h2>
+          <p class="hero-description">Multi-layered vetting of department submissions to prevent adverse judicial orders and contempt proceedings.</p>
+        </div>
+
+        <div class="quote-page" data-page="4">
+          <span class="gold-category-label">Legal Consultation Chamber</span>
+          <h2 class="hero-serif-headline">Departmental Advisory &amp; <em>Pre-Litigation Counsel</em>.</h2>
+          <p class="hero-description">Directing strategic legal guidance for revenue, municipal, forest, and service law administration.</p>
+        </div>
+
+        <div class="quote-page" data-page="5">
+          <span class="gold-category-label">Law Library &amp; Legal Archives</span>
+          <h2 class="hero-serif-headline">Judicial Precedent &amp; <em>Statutory Authority</em>.</h2>
+          <p class="hero-description">Curated repository of constitutional rulings, law reports, and Jammu &amp; Kashmir legislative gazettes.</p>
+        </div>
+
+        <div class="quote-page" data-page="6">
+          <span class="gold-category-label">Administrative Team · DLO Kupwara</span>
+          <h2 class="hero-serif-headline">Dedicated Legal Cadre &amp; <em>Public Integrity</em>.</h2>
+          <p class="hero-description">Diligent tracking of daily case dockets, cause lists, and communication across all subordinate courts.</p>
+        </div>
+
+        <div class="quote-page" data-page="7">
+          <span class="gold-category-label">Case Management Registry</span>
+          <h2 class="hero-serif-headline">Transparent Governance Through <em>Digital Precision</em>.</h2>
+          <p class="hero-description">Systematic monitoring of active government suits, appeal timelines, and court compliance mandates.</p>
+        </div>
+
+      </div>
+
+      <div class="hero-navigation-row">
+        <div class="slide-number-display">
+          <span id="activeNumber">01</span> <span class="dim">/ 08</span>
+        </div>
+
+        <div class="circular-arrows-group">
+          <button class="btn-circle-arrow" onclick="prevSlide()" aria-label="Previous Slide">
+            <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
+          </button>
+          <button class="btn-circle-arrow" onclick="nextSlide()" aria-label="Next Slide">
+            <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<!-- BOTTOM: simple arrow → Latest Orders / Updates -->
+<a href="latest-updates.html" class="orders-arrow-link" aria-label="Latest orders and updates" title="Latest Orders">
+  <span class="orders-arrow-icon" aria-hidden="true">
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M5 12h14"/><path d="M13 6l6 6-6 6"/>
+    </svg>
+  </span>
+</a>
+
+<!-- DEPARTMENTAL AUTHENTICATION MODAL -->
+<div class="modal-overlay" id="deptModal">
+  <div class="modal-card">
+    <button class="modal-close-btn" onclick="closeDeptModal()">✕</button>
+    <h3 style="font-family:'Cinzel',serif; font-size:1.25rem; color:var(--k-text); margin-bottom:0.4rem;">Departmental Portal Gateway</h3>
+    <p style="font-size:0.8rem; color:var(--k-text-muted); margin-bottom:1.6rem;">Authenticate to upload compliance reports, parawise replies, or submit requests for legal scrutiny.</p>
+
+    <div class="field-item">
+      <label>Stakeholder Department</label>
+      <select id="modalDeptSelect">
+        <option value="Revenue">Revenue Department</option>
+        <option value="ULB">Urban Local Bodies (ULB)</option>
+        <option value="PDD">Power Development Department (PDD)</option>
+        <option value="PWD">Public Works Department (R&amp;B)</option>
+        <option value="RDD">Rural Development Department</option>
+        <option value="Education">School Education</option>
+        <option value="JalShakti">Jal Shakti / PHE</option>
+        <option value="Forest">Forest &amp; Environment</option>
+      </select>
+    </div>
+
+    <div class="field-item">
+      <label>Department Nodal Code</label>
+      <input type="text" id="modalNodalCode" placeholder="e.g. REV-KUP-01" autocomplete="off" />
+    </div>
+
+    <div class="field-item">
+      <label>Security Passcode</label>
+      <input type="password" id="modalPasscode" placeholder="••••••••••••" autocomplete="off" />
+    </div>
+
+    <button class="btn-modal-action" onclick="dispatchToDepartmentGoogleForm()">
+      Authenticate &amp; Open Submissions
+    </button>
+  </div>
+</div>
+
+<!-- MINIMAL FOOTER -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      © 2026 District Litigation Office Kupwara. UT of Jammu &amp; Kashmir. All rights reserved.
+    </div>
+    <div style="font-size:0.68rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--k-gold);">
+      Department of Law, Justice and PA
+    </div>
+  </div>
+</footer>
+
+<script>
+// 3. Dramatic News & Circulars Portal Engine
+function toggleNewsPortal() {
+  window.location.href = 'latest-updates.html';
+}
+
+// 4. Departmental Login Modal
+function openDeptModal() {
+  document.getElementById('deptModal').style.display = 'flex';
+}
+function closeDeptModal() {
+  document.getElementById('deptModal').style.display = 'none';
+}
+function dispatchToDepartmentGoogleForm() {
+  const dept = document.getElementById('modalDeptSelect').value;
+  const code = document.getElementById('modalNodalCode').value.trim();
+  const pass = document.getElementById('modalPasscode').value.trim();
+
+  if (!code || !pass) {
+    alert('Please enter your designated Department Nodal Code and Passcode.');
+    return;
+  }
+
+  const baseGoogleForm = 'https://docs.google.com/forms/d/e/1FAIpQLSc_YOUR_GOOGLE_FORM_ID/viewform';
+  const prefilledUrl = `${baseGoogleForm}?usp=pp_url&entry.1000001=${encodeURIComponent(dept)}&entry.1000002=${encodeURIComponent(code)}`;
+
+  window.open(prefilledUrl, '_blank');
+  closeDeptModal();
+}
+
+// 6. SYNCHRONIZED SLIDE & 3D BOOK-PAGE TRANSITION ENGINE
+const slides = document.querySelectorAll('.hero-slide-img');
+const pages = document.querySelectorAll('.quote-page');
+const activeNumberEl = document.getElementById('activeNumber');
+const totalSlides = slides.length;
+
+let activeIdx = 0;
+let slideTimer = null;
+let isAnimating = false;
+
+function renderSlide(index, direction = 'next') {
+  if (index === activeIdx || isAnimating) return;
+  isAnimating = true;
+
+  const prevSlideEl = slides[activeIdx];
+  const nextSlideEl = slides[index];
+
+  const prevPage = pages[activeIdx];
+  const nextPage = pages[index];
+
+  slides.forEach(s => s.classList.remove('prev-active'));
+  prevSlideEl.classList.remove('active');
+  prevSlideEl.classList.add('prev-active');
+
+  nextSlideEl.classList.remove('prev-active');
+  nextSlideEl.classList.add('active');
+
+  pages.forEach(p => {
+    p.classList.remove('flipped-forward', 'flipped-backward', 'incoming-forward', 'incoming-backward');
+  });
+
+  if (direction === 'next') {
+    prevPage.classList.remove('active');
+    prevPage.classList.add('flipped-forward');
+
+    nextPage.classList.add('incoming-forward');
+    void nextPage.offsetWidth;
+    nextPage.classList.remove('incoming-forward');
+    nextPage.classList.add('active');
+  } else {
+    prevPage.classList.remove('active');
+    prevPage.classList.add('flipped-backward');
+
+    nextPage.classList.add('incoming-backward');
+    void nextPage.offsetWidth;
+    nextPage.classList.remove('incoming-backward');
+    nextPage.classList.add('active');
+  }
+
+  activeNumberEl.textContent = String(index + 1).padStart(2, '0');
+
+  setTimeout(() => {
+    prevSlideEl.classList.remove('prev-active');
+    prevPage.classList.remove('flipped-forward', 'flipped-backward');
+    isAnimating = false;
+  }, 1300);
+
+  activeIdx = index;
+}
+
+function nextSlide() {
+  const next = (activeIdx + 1) % totalSlides;
+  renderSlide(next, 'next');
+}
+
+function prevSlide() {
+  const prev = (activeIdx - 1 + totalSlides) % totalSlides;
+  renderSlide(prev, 'prev');
+}
+
+function startSlideLoop() {
+  slideTimer = setInterval(nextSlide, 8500);
+}
+startSlideLoop();
+</script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  if (window.DLO) {
+    DLO.registerSW();
+    try {
+      var key = (window.DLO_CONFIG && window.DLO_CONFIG.theme && window.DLO_CONFIG.theme.storageKey) || "dlo-theme-mode";
+      var stored = localStorage.getItem(key);
+      if (stored === "light" && !document.body.classList.contains("light-mode")) {
+        document.body.classList.add("light-mode");
+      } else if (stored === "dark") {
+        document.body.classList.remove("light-mode");
+      }
+    } catch (e) {}
+  }
+});
+</script>
+
+<!-- PWA Install — bottom-right (browser only) -->
+<button type="button" id="pwaInstallBtn" class="pwa-install-btn" aria-label="Install DLO Kupwara Web App" style="display:none">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M12 3v12"/><path d="M8 11l4 4 4-4"/><path d="M4 19h16"/>
+  </svg>
+  <span id="pwaInstallLabel">Install App</span>
+</button>
+
+<script>
+(function(){
+  if (!('serviceWorker' in navigator)) return;
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('./sw.js', { scope: './' })
+      .then(function(reg){
+        try { reg.update(); } catch(e){}
+      })
+      .catch(function(){});
+  });
+})();
+
+(function(){
+  var btn = document.getElementById('pwaInstallBtn');
+  var label = document.getElementById('pwaInstallLabel');
+  if (!btn) return;
+
+  function isStandalone(){
+    try {
+      if (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) return true;
+      if (window.matchMedia && window.matchMedia('(display-mode: fullscreen)').matches) return true;
+      if (navigator.standalone === true) return true;
+    } catch(e){}
+    return false;
+  }
+
+  if (isStandalone()) {
+    btn.style.display = 'none';
+    return;
+  }
+
+  var deferredPrompt = null;
+  var isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent || '');
+  var isAndroid = /android/i.test(navigator.userAgent || '');
+
+  function showBtn(text){
+    if (text && label) label.textContent = text;
+    btn.classList.add('visible');
+    btn.style.display = 'inline-flex';
+  }
+
+  if (isIOS) {
+    showBtn('Add to Home Screen');
+  } else {
+    showBtn('Install App');
+  }
+
+  window.addEventListener('beforeinstallprompt', function(e){
+    e.preventDefault();
+    deferredPrompt = e;
+    showBtn('Install App');
+  });
+
+  window.addEventListener('appinstalled', function(){
+    deferredPrompt = null;
+    btn.style.display = 'none';
+  });
+
+  btn.addEventListener('click', function(){
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then(function(choice){
+        if (choice && choice.outcome === 'accepted') {
+          btn.style.display = 'none';
+        }
+        deferredPrompt = null;
+      }).catch(function(){ deferredPrompt = null; });
+      return;
+    }
+
+    if (isIOS) {
+      var iosMsg = 'To install on iPhone/iPad:\n1. Tap the Share button (square with arrow)\n2. Scroll and tap “Add to Home Screen”\n3. Tap Add';
+      if (window.DLO && DLO.showToast) DLO.showToast('Share → Add to Home Screen', 'info', 6000);
+      else alert(iosMsg);
+      return;
+    }
+
+    var msg = isAndroid
+      ? 'Open the Chrome menu (⋮) → “Install app” or “Add to Home screen”.'
+      : 'Open the browser menu → “Install District Litigation Office Kupwara” or “Install app”.\n\nIf you do not see it yet, wait a few seconds after the page loads, or visit the site twice (Chrome only shows Install after the service worker is ready).';
+    if (window.DLO && DLO.showToast) DLO.showToast(msg.replace(/\n/g,' '), 'info', 7000);
+    else alert(msg);
+  });
+})();
+</script>
+
+<script>
+(function activateAppMode() {
+  function isApp() {
+    try {
+      if (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) return true;
+      if (window.matchMedia && window.matchMedia('(display-mode: fullscreen)').matches) return true;
+      if (window.navigator.standalone === true) return true;
+      if (/(?:\?|&)app=1(?:&|$)/.test(location.search || '')) return true;
+      if (document.referrer && document.referrer.indexOf('android-app://') === 0) return true;
+    } catch (e) {}
+    return false;
+  }
+  if (!isApp()) return;
+
+  document.documentElement.classList.add('app-mode');
+  document.body.classList.add('app-mode');
+
+  ['appTopbar','appHome','appTabbar'].forEach(function (id) {
+    var el = document.getElementById(id);
+    if (el) {
+      el.setAttribute('aria-hidden', 'false');
+      el.style.display = '';
+    }
+  });
+
+  ['.topbar','header.site-header','main.hero-minimal','.fullscreen-curtain',
+   '.news-dock-strip','footer.site-footer','.pwa-install-btn',
+   '.k-menu-trigger','.k-curtain'].forEach(function(sel){
+    document.querySelectorAll(sel).forEach(function(el){
+      el.style.display = 'none';
+    });
+  });
+})();
+</script>
+
+</body>
+</html>
