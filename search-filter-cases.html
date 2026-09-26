@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' https: data:; connect-src 'self' https://*.supabase.co https://*.functions.supabase.co; frame-src https://challenges.cloudflare.com; object-src 'none'; base-uri 'self'; form-action 'self';">
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+<meta http-equiv="Permissions-Policy" content="geolocation=(), camera=(), microphone=()">
+<meta name="description" content="Search and filter court cases — District Litigation Office Kupwara">
+<meta name="theme-color" content="#0B2545">
+<title>Search & Filter Cases | DLO Kupwara</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;600;700;900&family=Roboto:wght@300;400;500;600&family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="menu.css">
+<script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" crossorigin="anonymous"></script>
+<script src="common.js"></script>
+<style>
+:root{--navy:#0A1F3D;--navy-mid:#123059;--gold:#C6A358;--gold-light:#E0C083;}
+.section-title{font-family:'Playfair Display',serif!important}
+.filter-box{background:linear-gradient(160deg,var(--navy) 0%,var(--navy-mid) 100%)!important}
+.btn-primary,.filter-btn.btn-apply{background:linear-gradient(135deg,var(--gold-light),var(--gold))!important}
+</style>
+<meta property="og:title" content="Search & Filter Cases | DLO Kupwara">
+<meta property="og:description" content="Live case search and advanced filters — District Litigation Office Kupwara">
+<meta property="og:type" content="website">
+<meta name="robots" content="index,follow">
+</head>
+<body>
+<script>DLO.injectMenu();</script>
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-inner">
+    <span>Government of Jammu &amp; Kashmir | Department of Law, Justice &amp; Parliamentary Affairs</span>
+    <div class="live-badge"><span class="live-dot"></span> Live Data</div>
+  </div>
+</div>
+
+<section class="live-section" id="live-data" style="padding-top:60px">
+  <div class="container">
+    <div style="margin-bottom:36px">
+      <span class="section-eyebrow">Live Case Database</span>
+      <h2 class="section-title">Search &amp; Filter Cases</h2>
+      <div class="divider"></div>
+      <p style="font-size:14px;color:var(--muted)">Search across any column or use dropdown filters. Data is loaded live from the official master sheet.</p>
+    </div>
+
+    <!-- GLOBAL SEARCH -->
+    <div style="margin-bottom:20px;position:relative">
+      <input type="text" id="globalSearch" placeholder="🔍  Search by case number, title, subject, department, court, status, type..."
+        style="width:100%;padding:14px 20px 14px 48px;border:2px solid var(--gold);border-radius:10px;font-size:14px;font-family:'Inter',sans-serif;outline:none;background:var(--surface);color:var(--text);box-shadow:0 2px 12px rgba(201,162,74,0.15)"
+        autocomplete="off" maxlength="120">
+      <span style="position:absolute;left:16px;top:50%;transform:translateY(-50%);font-size:18px;pointer-events:none">🔍</span>
+      <button type="button" id="clearSearchBtn" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:var(--border);border:none;cursor:pointer;font-size:12px;color:var(--muted);padding:4px 10px;border-radius:6px;font-family:'Inter',sans-serif">Clear</button>
+    </div>
+
+    <!-- FILTER BOX -->
+    <div class="filter-box chess-bg">
+      <div class="filter-title">🔍 Filter &amp; Search Cases</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:14px">
+        <div class="filter-group">
+          <label>Case Status</label>
+          <select id="statusFilter">
+            <option value="">— Select Status —</option>
+            <option value="Active">Active Cases</option>
+            <option value="Disposed">Disposed Cases</option>
+            <option value="Pending">Pending Cases</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Select Court</label>
+          <select id="courtFilter"><option value="">— Select Court —</option></select>
+        </div>
+        <div class="filter-group">
+          <label>Select Department</label>
+          <select id="deptFilter"><option value="">— Select Department —</option></select>
+        </div>
+        <div class="filter-group">
+          <label>Reply Status</label>
+          <select id="replyFilter">
+            <option value="">— Select Reply Status —</option>
+            <option value="filed">Reply Filed ✅</option>
+            <option value="not">Reply Not Filed ❌</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Case Type</label>
+          <select id="typeFilter"><option value="">— Select Case Type —</option></select>
+        </div>
+        <div class="filter-group">
+          <label>Standing Counsel</label>
+          <select id="counselFilter"><option value="">— Select Standing Counsel —</option></select>
+        </div>
+        <div class="filter-group">
+          <label>Ex-parte Status</label>
+          <select id="exparteFilter">
+            <option value="">— Select Ex-parte Status —</option>
+            <option value="yes">Ex-parte ⚠️</option>
+            <option value="no">Not Ex-parte ✅</option>
+          </select>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+        <button type="button" class="filter-btn btn-apply" id="applyFilterBtn">Apply Filter</button>
+        <button type="button" class="filter-btn btn-clear" id="clearFilterBtn">Clear All</button>
+        <button type="button" id="viewAllBtn" style="background:rgba(255,255,255,0.12);color:#fff;border:1px solid rgba(255,255,255,0.25);padding:9px 18px;border-radius:7px;font-size:13px;font-weight:500;cursor:pointer">📋 View All Cases</button>
+        <button type="button" id="viewOverdueBtn" style="background:rgba(239,68,68,0.15);color:#FCA5A5;border:1px solid rgba(239,68,68,0.3);padding:9px 18px;border-radius:7px;font-size:13px;font-weight:500;cursor:pointer">⚠️ Overdue Cases</button>
+      </div>
+    </div>
+
+    <!-- PROMPT -->
+    <div id="filterPrompt" style="text-align:center;padding:40px 20px;background:var(--surface);border-radius:10px;border:1px dashed var(--border);margin-bottom:20px">
+      <div style="font-size:36px;margin-bottom:12px">🔍</div>
+      <h3 style="font-family:'Playfair Display',serif;font-size:18px;color:var(--text);margin-bottom:8px">Select filters to view cases</h3>
+      <p style="font-size:14px;color:var(--muted)">Use the filters above or click <strong>View All Cases</strong> / <strong>Overdue Cases</strong>.</p>
+    </div>
+
+    <!-- RESULTS -->
+    <div id="resultsSection" style="display:none">
+      <div class="results-count" id="resultsCount"></div>
+      <div class="export-bar">
+        <button type="button" class="btn-export btn-excel" id="exportExcelBtn">⬇ Download Excel</button>
+        <button type="button" class="btn-export btn-pdf" id="exportPdfBtn">⬇ Download PDF</button>
+        <button type="button" class="btn-export btn-print" id="printBtn">🖨 Print</button>
+      </div>
+      <div class="results-wrap">
+        <div class="results-table-scroll">
+          <table class="results-table" id="resultsTable">
+            <thead>
+              <tr>
+                <th>#</th><th>Case No.</th><th>Title of Case</th><th>Subject Matter</th>
+                <th>Department</th><th>Court</th><th>Last Proceedings</th>
+                <th>Next Hearing</th><th>Reply Status</th><th>Case Status</th>
+                <th>Case Type</th><th>Standing Counsel</th><th>Ex-parte</th>
+              </tr>
+            </thead>
+            <tbody id="resultsBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div id="loadingResults" class="loading-spinner" style="display:none">⏳ Loading cases...</div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div>© 2026 District Litigation Office Kupwara. All rights reserved.</div>
+    <div class="footer-dept">Department of Law, Justice &amp; Parliamentary Affairs</div>
+  </div>
+</footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', async function () {
+  if (!window.DLO) return;
+  DLO.registerSW();
+
+  var ALL_ROWS = [];
+  var FILTERED_ROWS = [];
+
+  var globalSearch  = document.getElementById('globalSearch');
+  var clearSearchBtn= document.getElementById('clearSearchBtn');
+  var statusFilter  = document.getElementById('statusFilter');
+  var courtFilter   = document.getElementById('courtFilter');
+  var deptFilter    = document.getElementById('deptFilter');
+  var replyFilter   = document.getElementById('replyFilter');
+  var typeFilter    = document.getElementById('typeFilter');
+  var counselFilter = document.getElementById('counselFilter');
+  var exparteFilter = document.getElementById('exparteFilter');
+  var applyBtn      = document.getElementById('applyFilterBtn');
+  var clearBtn      = document.getElementById('clearFilterBtn');
+  var viewAllBtn    = document.getElementById('viewAllBtn');
+  var viewOverdueBtn= document.getElementById('viewOverdueBtn');
+  var filterPrompt  = document.getElementById('filterPrompt');
+  var resultsSection= document.getElementById('resultsSection');
+  var resultsCount  = document.getElementById('resultsCount');
+  var resultsBody   = document.getElementById('resultsBody');
+  var loadingEl     = document.getElementById('loadingResults');
+
+  // ── Load data ──────────────────────────────────────────────
+  function showLoading(on) {
+    if (loadingEl) loadingEl.style.display = on ? 'block' : 'none';
+  }
+
+  showLoading(true);
+  try {
+    ALL_ROWS = await DLO.fetchCaseDiary();
+    populateDropdowns(ALL_ROWS);
+  } catch (e) {
+    console.error('[Search] data load failed:', e);
+    DLO.showToast('Failed to load case data', 'error', 5000);
+  }
+  showLoading(false);
+
+  // ── Populate filter dropdowns ──────────────────────────────
+  function populateDropdowns(rows) {
+    var courts = [], depts = [], types = [], counsels = [];
+    rows.forEach(function (r) {
+      if (r.court && !courts.includes(r.court)) courts.push(r.court);
+      if (r.department && !depts.includes(r.department)) depts.push(r.department);
+      if (r.type && !types.includes(r.type)) types.push(r.type);
+      if (r.advocateName && !counsels.includes(r.advocateName)) counsels.push(r.advocateName);
+    });
+    function fill(sel, arr) {
+      if (!sel) return;
+      arr.sort().forEach(function (v) {
+        var o = document.createElement('option');
+        o.value = v; o.textContent = v;
+        sel.appendChild(o);
+      });
+    }
+    fill(courtFilter, courts);
+    fill(deptFilter, depts);
+    fill(typeFilter, types);
+    fill(counselFilter, counsels);
+  }
+
+  // ── Filter logic ───────────────────────────────────────────
+  function applyFilter() {
+    var q       = (globalSearch ? globalSearch.value.trim().toLowerCase() : '');
+    var status  = statusFilter  ? statusFilter.value  : '';
+    var court   = courtFilter   ? courtFilter.value   : '';
+    var dept    = deptFilter    ? deptFilter.value    : '';
+    var reply   = replyFilter   ? replyFilter.value   : '';
+    var type    = typeFilter    ? typeFilter.value    : '';
+    var counsel = counselFilter ? counselFilter.value : '';
+    var exparte = exparteFilter ? exparteFilter.value : '';
+
+    FILTERED_ROWS = ALL_ROWS.filter(function (r) {
+      if (status  && !(r.status || '').toLowerCase().includes(status.toLowerCase())) return false;
+      if (court   && r.court !== court) return false;
+      if (dept    && r.department !== dept) return false;
+      if (type    && r.type !== type) return false;
+      if (counsel && r.advocateName !== counsel) return false;
+      if (reply === 'filed' && !(r.reply || '').toLowerCase().includes('filed')) return false;
+      if (reply === 'not'   &&  (r.reply || '').toLowerCase().includes('filed')) return false;
+      if (exparte === 'yes' && (r.exparte || '').toLowerCase() !== 'yes') return false;
+      if (exparte === 'no'  && (r.exparte || '').toLowerCase() === 'yes') return false;
+      if (q) {
+        var hay = [r.cnrCaseNo, r.caseTitle, r.subjectMatter, r.department,
+                   r.court, r.status, r.type, r.advocateName].join(' ').toLowerCase();
+        if (!hay.includes(q)) return false;
+      }
+      return true;
+    });
+    renderResults(FILTERED_ROWS);
+  }
+
+  function clearFilter() {
+    [statusFilter, courtFilter, deptFilter, replyFilter, typeFilter, counselFilter, exparteFilter]
+      .forEach(function (s) { if (s) s.value = ''; });
+    if (globalSearch) globalSearch.value = '';
+    hideResults();
+  }
+
+  function viewAll() {
+    [statusFilter, courtFilter, deptFilter, replyFilter, typeFilter, counselFilter, exparteFilter]
+      .forEach(function (s) { if (s) s.value = ''; });
+    if (globalSearch) globalSearch.value = '';
+    FILTERED_ROWS = ALL_ROWS.slice();
+    renderResults(FILTERED_ROWS);
+  }
+
+  function viewOverdue() {
+    var today = DLO.nowIST(); today.setHours(0,0,0,0);
+    FILTERED_ROWS = ALL_ROWS.filter(function (r) {
+      if ((r.status || '').toLowerCase().includes('dispos')) return false;
+      if (!r.nextHearing) return false;
+      var d = new Date(r.nextHearing); d.setHours(0,0,0,0);
+      return !isNaN(d) && d < today;
+    });
+    if (statusFilter) statusFilter.value = '';
+    renderResults(FILTERED_ROWS);
+  }
+
+  function hideResults() {
+    if (filterPrompt)   filterPrompt.style.display   = 'block';
+    if (resultsSection) resultsSection.style.display = 'none';
+  }
+
+  // ── Render results table ───────────────────────────────────
+  function renderResults(rows) {
+    if (filterPrompt)   filterPrompt.style.display   = 'none';
+    if (resultsSection) resultsSection.style.display = 'block';
+    if (resultsCount) resultsCount.textContent = rows.length + ' case' + (rows.length !== 1 ? 's' : '') + ' found';
+    if (!resultsBody) return;
+    if (!rows.length) {
+      resultsBody.innerHTML = '<tr><td colspan="13" style="text-align:center;padding:24px;color:var(--muted)">No cases match the selected filters.</td></tr>';
+      return;
+    }
+    resultsBody.innerHTML = rows.map(function (r, i) {
+      return '<tr>' +
+        '<td>' + (i + 1) + '</td>' +
+        '<td>' + DLO.escapeHtml(r.cnrCaseNo) + '</td>' +
+        '<td>' + DLO.escapeHtml(r.caseTitle) + '</td>' +
+        '<td>' + DLO.escapeHtml(r.subjectMatter) + '</td>' +
+        '<td>' + DLO.escapeHtml(r.department) + '</td>' +
+        '<td>' + DLO.escapeHtml(r.court) + '</td>' +
+        '<td>' + DLO.escapeHtml(r.lastProceedings) + '</td>' +
+        '<td>' + DLO.formatDDMMYYYY(r.nextHearing) + '</td>' +
+        '<td>' + DLO.escapeHtml(r.reply) + '</td>' +
+        '<td>' + DLO.escapeHtml(r.status) + '</td>' +
+        '<td>' + DLO.escapeHtml(r.type) + '</td>' +
+        '<td>' + DLO.escapeHtml(r.advocateName) + '</td>' +
+        '<td>' + DLO.escapeHtml(r.exparte) + '</td>' +
+        '</tr>';
+    }).join('');
+  }
+
+  // ── Wire buttons ───────────────────────────────────────────
+  if (applyBtn)       applyBtn.addEventListener('click', applyFilter);
+  if (clearBtn)       clearBtn.addEventListener('click', clearFilter);
+  if (viewAllBtn)     viewAllBtn.addEventListener('click', viewAll);
+  if (viewOverdueBtn) viewOverdueBtn.addEventListener('click', viewOverdue);
+  if (clearSearchBtn) clearSearchBtn.addEventListener('click', function () {
+    if (globalSearch) globalSearch.value = '';
+    if (ALL_ROWS.length) applyFilter();
+  });
+  if (globalSearch) globalSearch.addEventListener('input', function () {
+    if (resultsSection && resultsSection.style.display !== 'none') applyFilter();
+  });
+
+  // ── Export: Print ──────────────────────────────────────────
+  var printBtn = document.getElementById('printBtn');
+  if (printBtn) printBtn.addEventListener('click', function () { window.print(); });
+
+  // ── Export: CSV/Excel ──────────────────────────────────────
+  var exportExcelBtn = document.getElementById('exportExcelBtn');
+  if (exportExcelBtn) exportExcelBtn.addEventListener('click', function () {
+    if (!FILTERED_ROWS.length) { DLO.showToast('No data to export', 'warn', 2500); return; }
+    var header = ['#','Case No','Title','Subject','Department','Court','Last Proceedings','Next Hearing','Reply','Status','Type','Counsel','Ex-parte'];
+    var rows = FILTERED_ROWS.map(function (r, i) {
+      return [i+1, r.cnrCaseNo, r.caseTitle, r.subjectMatter, r.department, r.court,
+              r.lastProceedings, DLO.formatDDMMYYYY(r.nextHearing), r.reply, r.status, r.type, r.advocateName, r.exparte]
+        .map(function (v) { return '"' + String(v || '').replace(/"/g, '""') + '"'; }).join(',');
+    });
+    var csv = [header.join(',')].concat(rows).join('\r\n');
+    var blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a'); a.href = url;
+    a.download = 'DLO_Cases_' + new Date().toISOString().slice(0,10) + '.csv';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    DLO.showToast('CSV downloaded', 'success', 2500);
+  });
+
+  // ── Export: PDF (print dialog) ─────────────────────────────
+  var exportPdfBtn = document.getElementById('exportPdfBtn');
+  if (exportPdfBtn) exportPdfBtn.addEventListener('click', function () {
+    if (!FILTERED_ROWS.length) { DLO.showToast('No data to export', 'warn', 2500); return; }
+    window.print();
+  });
+});
+</script>
+
+</body>
+</html>
