@@ -1120,6 +1120,8 @@
           if (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) return true;
           if (window.matchMedia && window.matchMedia('(display-mode: fullscreen)').matches) return true;
           if (navigator.standalone === true) return true;
+          if (/(?:\?|&)app=1(?:&|$)/.test(location.search || '')) return true;
+          if (document.referrer && document.referrer.indexOf('android-app://') === 0) return true;
         } catch(e) {}
         return false;
       }
@@ -1134,7 +1136,10 @@
         installBtn.classList.add('k-install-visible');
       }
 
-      if (isIOS) showInstallBtn('Add to Home Screen');
+      // Keep the install action in the menu on every browser. If the browser
+      // does not provide a native install prompt, its click handler explains
+      // the manual install steps instead.
+      showInstallBtn(isIOS ? 'Add to Home Screen' : 'Install App');
 
       window.addEventListener('beforeinstallprompt', function(e) {
         e.preventDefault();

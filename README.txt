@@ -10,3 +10,5 @@ Google Sheets setup
 The published CSV is public and read-only. The final files do not contain a sheet URL because none was supplied.
 
 The homepage keeps its existing quote copy when no updates are available. Hero image paths use WebP, including the fallback files hero-entrance.webp and signage-detail.webp. Those image assets were not attached, so confirm they exist at the paths used in index.html before publishing.
+
+The app-install action is in the site menu footer. The homepage control now reads “+ Further Updates” and opens the right-side updates drawer.
