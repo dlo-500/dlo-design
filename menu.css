@@ -540,3 +540,23 @@
   .k-curtain { transform: none !important; }
   .k-nav-group, .k-curtain-item { transform: none !important; }
 }
+Fix for invisible menu links intercepting homepage clicks
+
+Apply this snippet by appending it to the existing menu.css in the website repository. Do not replace the full menu.css file with this snippet.
+
+/* Keep the closed full-screen menu out of the hit-test and accessibility trees. */
+.k-curtain {
+  visibility: hidden;
+  transition: opacity 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+              visibility 0s linear 0.42s;
+}
+.k-curtain.open {
+  visibility: visible;
+  transition-delay: 0s;
+}
+.k-curtain:not(.open) * {
+  pointer-events: none !important;
+}
+
+Why: menu.css gives the closed curtain pointer-events:none, but .k-curtain-link sets pointer-events:auto. Its transparent full-screen curtain can therefore route clicks to invisible menu links, such as Daily Cause List.
