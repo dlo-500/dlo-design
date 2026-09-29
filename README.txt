@@ -1,12 +1,16 @@
-DLO Kupwara PWA app and analytics update
+DLO Kupwara app dashboard update
 
-Upload these files to the existing site repository:
-- Replace index.html, analytics.html, common.js, config.js, and menu.css.
-- Replace manifest.json.
-- Add every file from icons/ at the same relative paths, including the new Department Login shortcut icon.
+The app home screen is reorganised into a daily glance, Main Actions, Case Management, Office & Updates, and Administration. It uses responsive cards and motion that respects the visitor's reduced-motion setting. Dark mode remains the default; the theme control keeps the visitor's choice across app pages.
 
-The app dashboard uses the same shared case-data loader and statistics calculation as the website analytics. No additional SQL function or Supabase policy change is needed. Its public error message is deliberately simple and directs visitors to retry without exposing technical details.
+The shared app navigation keeps Home and Contact available on app pages. Internal app links retain app mode and warm their page cache before a tap when the browser supports prefetch. Shared case records are cached for the current browser tab and shown immediately on a return visit while older data refreshes quietly.
 
-Keep the site's existing styles.css, logo.png, emblem and service worker files in place. The shared toolbar now occupies its own top row on content pages so it cannot cover headings; in the installed app its search, language, text-size and theme controls sit in the branded app bar. The shared theme toggle works across pages, starts in dark mode and remembers the visitor's later choice. A new storage key resets an old saved light preference once.
+Upload or replace these files in the existing repository:
+- index.html
+- analytics.html
+- common.js
+- config.js
+- menu.css
+- manifest.json
+- all files under icons/
 
-Quick-access icons appear before the case overview on the app home screen. The app layout adapts to available viewport width, uses line icons with short hover/entrance motion, respects safe areas and reduced-motion preferences, and supports either orientation. Analytics panels and the department table scroll horizontally on narrow screens. The attached screenshots guided the spacing fix; the icon artwork remains in the site's DLO navy and gold style.
+Keep the site's other page files, stylesheets, logo, and existing service worker in place. This package does not include a live site deployment. First-time page visits still need a network response; subsequent visits can reuse browser and tab-session caches.
