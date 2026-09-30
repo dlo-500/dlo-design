@@ -849,30 +849,30 @@ html.app-navigating::before {
 
 /* App-only icon sizing keeps touch controls clear at phone widths. */
 html.app-mode .app-action-icon {
-  flex-basis: clamp(56px, 6vw, 62px) !important;
-  width: clamp(56px, 6vw, 62px) !important;
-  height: clamp(56px, 6vw, 62px) !important;
+  flex-basis: clamp(64px, 7vw, 76px) !important;
+  width: clamp(64px, 7vw, 76px) !important;
+  height: clamp(64px, 7vw, 76px) !important;
 }
 html.app-mode .app-action-icon svg {
-  width: clamp(29px, 3vw, 31px) !important;
-  height: clamp(29px, 3vw, 31px) !important;
+  width: clamp(38px, 4.2vw, 44px) !important;
+  height: clamp(38px, 4.2vw, 44px) !important;
 }
 html.app-mode .app-glance-item svg {
-  width: clamp(24px, 2.7vw, 28px) !important;
-  height: clamp(24px, 2.7vw, 28px) !important;
+  width: clamp(28px, 3.2vw, 32px) !important;
+  height: clamp(28px, 3.2vw, 32px) !important;
 }
 html.app-mode .app-home-actions a .ic {
-  width: clamp(56px, 6vw, 60px) !important;
-  height: clamp(56px, 6vw, 60px) !important;
-  flex: 0 0 clamp(56px, 6vw, 60px) !important;
-  font-size: clamp(26px, 2.8vw, 30px) !important;
+  width: clamp(64px, 7vw, 74px) !important;
+  height: clamp(64px, 7vw, 74px) !important;
+  flex: 0 0 clamp(64px, 7vw, 74px) !important;
+  font-size: clamp(32px, 3.4vw, 36px) !important;
 }
 html.app-mode :is(.app-tabbar, .dlo-app-bottom-nav) :is(a,button) {
   min-width: 0;
-  min-height: 60px;
+  min-height: 64px;
 }
 html.app-mode :is(.app-tabbar, .dlo-app-bottom-nav) :is(a,button) svg {
   flex: 0 0 auto;
-  width: clamp(28px, 3.4vw, 32px) !important;
-  height: clamp(28px, 3.4vw, 32px) !important;
+  width: clamp(32px, 4vw, 36px) !important;
+  height: clamp(32px, 4vw, 36px) !important;
 }
