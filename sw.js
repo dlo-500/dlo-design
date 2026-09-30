@@ -1,5 +1,5 @@
 // DLO Kupwara: versioned shell cache with network-first page updates.
-const STATIC_CACHE = 'dlo-kupwara-static-v12';
+const STATIC_CACHE = 'dlo-kupwara-static-v13';
 const DATA_CACHE = 'dlo-kupwara-data-v6';
 
 const STATIC_ASSETS = [
