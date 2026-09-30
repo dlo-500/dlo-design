@@ -917,3 +917,33 @@ html.app-mode .dlo-app-bottom-nav {
     padding-bottom: calc(96px + env(safe-area-inset-bottom)) !important;
   }
 }
+
+
+/* App-only icon emphasis: stronger glyphs while preserving the existing grids. */
+html.app-mode .app-action-icon {
+  flex-basis: clamp(78px, 22vw, 88px) !important;
+  width: clamp(78px, 22vw, 88px) !important;
+  height: clamp(78px, 22vw, 88px) !important;
+}
+html.app-mode .app-action-icon svg {
+  width: clamp(54px, 15vw, 62px) !important;
+  height: clamp(54px, 15vw, 62px) !important;
+}
+html.app-mode .app-glance-item svg {
+  width: clamp(36px, 9vw, 40px) !important;
+  height: clamp(36px, 9vw, 40px) !important;
+}
+html.app-mode .app-home-actions a .ic {
+  width: clamp(78px, 22vw, 88px) !important;
+  height: clamp(78px, 22vw, 88px) !important;
+  flex: 0 0 clamp(78px, 22vw, 88px) !important;
+  font-size: clamp(42px, 12vw, 48px) !important;
+}
+html.app-mode :is(.app-tabbar, .dlo-app-bottom-nav) :is(a, button) {
+  min-height: 76px !important;
+}
+html.app-mode :is(.app-tabbar, .dlo-app-bottom-nav) :is(a, button) svg {
+  flex: 0 0 clamp(48px, 13vw, 52px) !important;
+  width: clamp(48px, 13vw, 52px) !important;
+  height: clamp(48px, 13vw, 52px) !important;
+}
