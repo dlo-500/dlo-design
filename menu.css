@@ -906,3 +906,14 @@ html.app-mode :is(.app-tabbar, .dlo-app-bottom-nav) :is(a, button) svg {
   width: clamp(40px, 11vw, 44px) !important;
   height: clamp(40px, 11vw, 44px) !important;
 }
+
+
+/* App pages must override the public site's generic app-mode nav hiding. */
+html.app-mode .dlo-app-bottom-nav {
+  display: flex !important;
+}
+@media (max-width: 767px) {
+  html.app-mode body.dlo-app-subpage {
+    padding-bottom: calc(96px + env(safe-area-inset-bottom)) !important;
+  }
+}
