@@ -758,6 +758,9 @@
     const current = currentPageFile();
     const existing = document.getElementById('appTabbar');
     if (existing) {
+      if (!document.getElementById('appHome')) {
+        document.body.classList.add('dlo-app-subpage');
+      }
       existing.setAttribute('aria-hidden', 'false');
       existing.querySelectorAll('a').forEach(link => {
         const url = new URL(link.href, global.location.href);
