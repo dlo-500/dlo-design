@@ -876,3 +876,33 @@ html.app-mode :is(.app-tabbar, .dlo-app-bottom-nav) :is(a,button) svg {
   width: clamp(32px, 4vw, 36px) !important;
   height: clamp(32px, 4vw, 36px) !important;
 }
+
+
+/* App mobile: enlarge the drawn glyphs and keep their flex size in sync. */
+html.app-mode .app-action-icon {
+  flex-basis: clamp(72px, 20vw, 80px) !important;
+  width: clamp(72px, 20vw, 80px) !important;
+  height: clamp(72px, 20vw, 80px) !important;
+}
+html.app-mode .app-action-icon svg {
+  width: clamp(46px, 12vw, 52px) !important;
+  height: clamp(46px, 12vw, 52px) !important;
+}
+html.app-mode .app-glance-item svg {
+  width: clamp(32px, 8vw, 36px) !important;
+  height: clamp(32px, 8vw, 36px) !important;
+}
+html.app-mode .app-home-actions a .ic {
+  width: clamp(72px, 20vw, 80px) !important;
+  height: clamp(72px, 20vw, 80px) !important;
+  flex: 0 0 clamp(72px, 20vw, 80px) !important;
+  font-size: clamp(36px, 10vw, 42px) !important;
+}
+html.app-mode :is(.app-tabbar, .dlo-app-bottom-nav) :is(a, button) {
+  min-height: 72px !important;
+}
+html.app-mode :is(.app-tabbar, .dlo-app-bottom-nav) :is(a, button) svg {
+  flex: 0 0 clamp(40px, 11vw, 44px) !important;
+  width: clamp(40px, 11vw, 44px) !important;
+  height: clamp(40px, 11vw, 44px) !important;
+}
