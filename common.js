@@ -56,7 +56,8 @@
     'last_proceedings', 'reply_status', 'case_status', 'case_type',
     'advocate_name', 'exparte_status', 'next_hearing_date'
   ].join(',');
-  const CASE_DIARY_SESSION_KEY = 'dlo-case-diary-session-v1';
+  // v2: the cache now holds the complete (paged) table, not a 1,000-row slice.
+  const CASE_DIARY_SESSION_KEY = 'dlo-case-diary-session-v2';
   const CASE_DIARY_CACHE_MAX_AGE = 45 * 1000;
   let _caseDiaryCache = null;
   let _caseDiaryUpdatedAt = 0;
@@ -86,35 +87,144 @@
     return rows;
   }
 
+  // ── Paged reads (no database changes) ────────────────────────────────────
+  // The API caps every response (1,000 rows by default), so a bare select()
+  // silently drops rows beyond the cap. These helpers read page by page until
+  // the exact count is reached. Ordering is the Case Search ordering
+  // (cnr_case_no ascending, blanks last) plus s_no as a tiebreaker so pages
+  // never overlap or skip rows; if s_no is not readable we retry without it.
+  const DLO_PAGE_SIZE = 1000;
+  let _sNoOrderOk = true;
+
+  function orderCases(query, withTiebreak) {
+    let q = query.order('cnr_case_no', { ascending: true, nullsFirst: false });
+    if (withTiebreak && _sNoOrderOk) q = q.order('s_no', { ascending: true });
+    return q;
+  }
+
+  async function pagedSelect(build, signal) {
+    const rows = [];
+    let total = null;
+    for (let from = 0; ; ) {
+      let q = build(from === 0).range(from, from + DLO_PAGE_SIZE - 1);
+      if (signal && q.abortSignal) q = q.abortSignal(signal);
+      const res = await q;
+      if (res.error) throw res.error;
+      const data = res.data || [];
+      if (from === 0 && Number.isFinite(res.count)) total = res.count;
+      rows.push.apply(rows, data);
+      from += data.length;
+      if (!data.length || (total !== null ? rows.length >= total : data.length < DLO_PAGE_SIZE)) break;
+    }
+    return rows;
+  }
+
+  async function pagedSelectOrdered(build, signal) {
+    try {
+      return await pagedSelect(build, signal);
+    } catch (error) {
+      if (_sNoOrderOk && /s_no|permission|column/i.test(String(error && error.message))) {
+        _sNoOrderOk = false;
+        return pagedSelect(build, signal);
+      }
+      throw error;
+    }
+  }
+
+  function mapCaseRow(r) {
+    return {
+      cnrCaseNo: r.cnr_case_no || '',
+      caseTitle: r.case_title || '',
+      subjectMatter: r.subject_matter || '',
+      department: r.department || 'Unknown',
+      court: r.court_name || 'Unknown',
+      lastProceedings: r.last_proceedings || '',
+      nextHearing: r.next_hearing_date || null,
+      reply: r.reply_status || '',
+      status: r.case_status || '',
+      type: r.case_type || 'Other',
+      advocateName: r.advocate_name || '',
+      exparte: r.exparte_status || ''
+    };
+  }
+
+  let _caseDiaryLastError = null;
+
   function refreshCaseDiary() {
     if (_caseDiaryPromise) return _caseDiaryPromise;
     const sb = getSupabaseClient();
     if (!sb) return Promise.resolve(restoreCaseDiarySession() || []);
-    _caseDiaryPromise = sb.from('case_diary').select(CASE_DIARY_SELECT_COLUMNS).then(({ data, error }) => {
-      if (error) {
-        console.error('[DLO] case_diary fetch failed:', error.message);
-        return restoreCaseDiarySession() || [];
-      }
-      const rows = (data || []).map(r => ({
-        cnrCaseNo: r.cnr_case_no || '',
-        caseTitle: r.case_title || '',
-        subjectMatter: r.subject_matter || '',
-        department: r.department || 'Unknown',
-        court: r.court_name || 'Unknown',
-        lastProceedings: r.last_proceedings || '',
-        nextHearing: r.next_hearing_date || null,
-        reply: r.reply_status || '',
-        status: r.case_status || '',
-        type: r.case_type || 'Other',
-        advocateName: r.advocate_name || '',
-        exparte: r.exparte_status || ''
-      }));
-      return saveCaseDiarySession(rows);
+    _caseDiaryPromise = pagedSelectOrdered(
+      first => orderCases(sb.from('case_diary')
+        .select(CASE_DIARY_SELECT_COLUMNS, first ? { count: 'exact' } : undefined), true)
+    ).then(data => {
+      _caseDiaryLastError = null;
+      return saveCaseDiarySession(data.map(mapCaseRow));
     }).catch(error => {
+      _caseDiaryLastError = error || new Error('case_diary fetch failed');
       console.error('[DLO] case_diary fetch failed:', error && error.message ? error.message : error);
       return restoreCaseDiarySession() || [];
     }).finally(() => { _caseDiaryPromise = null; });
     return _caseDiaryPromise;
+  }
+
+  // ── Case Search data access (shared with search-filter-cases.html) ──────
+  const CASE_SEARCH_FIELDS = [
+    'cnr_case_no', 'case_title', 'subject_matter', 'department', 'court_name',
+    'last_proceedings', 'reply_status', 'case_status',
+    'case_type', 'advocate_name', 'exparte_status'
+  ];
+  const CASE_FILTER_COLUMNS = [
+    'case_status', 'court_name', 'department', 'reply_status',
+    'case_type', 'advocate_name', 'exparte_status'
+  ];
+
+  function applySearch(query, term, filters) {
+    const pattern = '%' + term + '%';
+    let q = query.or(CASE_SEARCH_FIELDS.map(c => c + '.ilike.' + pattern).join(','));
+    Object.keys(filters || {}).forEach(c => { q = q.eq(c, filters[c]); });
+    return q;
+  }
+
+  // One chunk of matches, in Case Search order. Returns { rows, count }.
+  async function searchCases(term, filters, offset, limit, signal) {
+    const sb = getSupabaseClient();
+    if (!sb) throw new Error('The case database is unavailable.');
+    async function run(withTiebreak) {
+      let q = orderCases(applySearch(
+        sb.from('case_diary').select(CASE_DIARY_SELECT_COLUMNS, { count: 'exact' }), term, filters
+      ), withTiebreak).range(offset, offset + limit - 1);
+      if (signal && q.abortSignal) q = q.abortSignal(signal);
+      return q;
+    }
+    let res = await run(true);
+    if (res.error && _sNoOrderOk && /s_no|permission|column/i.test(String(res.error.message))) {
+      _sNoOrderOk = false;
+      res = await run(false);
+    }
+    if (res.error) throw res.error;
+    const data = res.data || [];
+    return { rows: data.map(mapCaseRow), raw: data, count: Number.isFinite(res.count) ? res.count : data.length };
+  }
+
+  // Distinct values for every filter column across ALL matches of a search
+  // (not just the first page). Reads only the 7 filter columns, 1,000 rows per
+  // request. Returns { case_status: [...], court_name: [...], ... }.
+  async function getDistinctFilterValues(term, signal) {
+    const sb = getSupabaseClient();
+    if (!sb) throw new Error('The case database is unavailable.');
+    const rows = await pagedSelectOrdered(
+      first => orderCases(applySearch(
+        sb.from('case_diary').select(CASE_FILTER_COLUMNS.join(','), first ? { count: 'exact' } : undefined), term, {}
+      ), true), signal
+    );
+    const out = {};
+    CASE_FILTER_COLUMNS.forEach(col => {
+      const values = Array.from(new Set(rows.map(r => String(r[col] || '').trim()).filter(Boolean)));
+      values.sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
+      out[col] = values;
+    });
+    return out;
   }
 
   async function fetchCaseDiary(force) {
@@ -279,6 +389,10 @@
 
   function formatDDMMYYYY(d) {
     if (!d) return '—';
+    if (typeof d === 'string') {
+      const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(d.trim());
+      if (m) return `${m[3]}-${m[2]}-${m[1]}`;
+    }
     const dt = d instanceof Date ? d : new Date(d);
     if (isNaN(dt.getTime())) return '—';
     const day = String(dt.getDate()).padStart(2, '0');
@@ -386,6 +500,7 @@
       button.setAttribute('title', label);
       button.setAttribute('aria-pressed', isLight ? 'true' : 'false');
     });
+    try { document.dispatchEvent(new CustomEvent('dlo:theme-changed', { detail: { mode: isLight ? 'light' : 'dark' } })); } catch (e) {}
   }
 
   function initTheme() {
@@ -1509,6 +1624,9 @@
     injectMenu,
     getSupabaseClient,
     fetchCaseDiary,
+    searchCases,
+    getDistinctFilterValues,
+    getCaseDiaryError: () => _caseDiaryLastError,
     fetchSiteUpdates,
     setLanguage,
     applyLanguage,

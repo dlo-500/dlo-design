@@ -1190,10 +1190,31 @@ function nowIST() {
 // ═══════════════════════════════════════════════
 //  FETCH CASE DIARY (from Supabase, was Google Sheets)
 // ═══════════════════════════════════════════════
+// Reads every row, page by page. A bare select() is capped by the API (1,000
+// rows by default) and would silently drop the rest. `make(first)` builds the
+// query (with its existing ordering); the exact count is requested once.
+async function pagedAll(make) {
+  const PAGE = 1000, rows = [];
+  let total = null;
+  for (let from = 0; ; ) {
+    const res = await make(from === 0).range(from, from + PAGE - 1);
+    if (res.error) throw res.error;
+    const data = res.data || [];
+    if (from === 0 && Number.isFinite(res.count)) total = res.count;
+    rows.push.apply(rows, data);
+    from += data.length;
+    if (!data.length || (total !== null ? rows.length >= total : data.length < PAGE)) break;
+  }
+  return rows;
+}
+const CASE_DIARY_COLUMNS = 's_no,cnr_case_no,case_title,subject_matter,department,court_name,last_proceedings,next_hearing_date,reply_status,case_status,case_type,advocate_name,exparte_status';
+const CASE_HISTORY_COLUMNS = 'created_at,hearing_date,proceedings_summary,advocate_name,attendance,case_diary(case_title, cnr_case_no, department, court_name, exparte_status, case_status)';
+
 async function fetchSheetData() {
   try {
-    const { data, error } = await sb.from('case_diary').select('*').order('s_no');
-    if (error) throw error;
+    const data = await pagedAll(first => sb.from('case_diary')
+      .select(CASE_DIARY_COLUMNS, first ? { count: 'exact' } : undefined)
+      .order('s_no'));
 
     ALL_ROWS = (data || []).map(r => ({
       sr:          r.s_no != null ? String(r.s_no) : '',
@@ -1229,11 +1250,15 @@ function escapeHtml(val) {
 // ═══════════════════════════════════════════════
 async function fetchHistoryLog() {
   try {
-    const { data, error } = await sb
-      .from('case_history')
-      .select('*, case_diary(case_title, cnr_case_no, department, court_name, exparte_status, case_status)')
-      .order('created_at', { ascending: false });
-    if (error) throw error;
+    const historyQuery = (first, tiebreak) => {
+      let q = sb.from('case_history')
+        .select(CASE_HISTORY_COLUMNS, first ? { count: 'exact' } : undefined)
+        .order('created_at', { ascending: false });
+      return tiebreak ? q.order('id', { ascending: true }) : q;   // fixed order for equal timestamps so pages never overlap or skip rows
+    };
+    let data;
+    try { data = await pagedAll(first => historyQuery(first, true)); }
+    catch (e) { data = await pagedAll(first => historyQuery(first, false)); }   // e.g. id not readable
 
     HISTORY_ROWS = (data || []).map(r => ({
       entryDate:   r.created_at ? new Date(r.created_at) : null,

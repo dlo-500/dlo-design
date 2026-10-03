@@ -926,3 +926,182 @@ html.app-mode .dlo-app-bottom-nav {
 html.app-mode body.dlo-app-subpage {
   padding-bottom: calc(96px + env(safe-area-inset-bottom)) !important;
 }
+
+/* ── Theme readability corrections ───────────────────────────────────────
+   Corrections only: no palette, layout or typography change. The shared rules
+   above force every [class*="-card|-panel|-box"] to the panel colour and every
+   heading/paragraph to the theme text colour, while the pages still paint their
+   own sections, navy blocks, striped rows, stat numbers, badges and gold labels
+   with fixed light-theme colours. That left parts of each page unreadable in one
+   theme or the other. Each rule below repairs one of those, for the website AND
+   the installed-app sub-pages, using the existing --dlo-* tokens. */
+html[data-theme="light"]:not(.app-mode) body .whatsapp-btn,
+html.app-mode body.dlo-app-subpage.light-mode .whatsapp-btn,
+html[data-theme="dark"]:not(.app-mode) body .whatsapp-btn,
+html.app-mode body.dlo-app-subpage:not(.light-mode) .whatsapp-btn {
+  color:#04361a !important
+}
+html[data-theme="light"]:not(.app-mode) body footer .footer-inner > div:not(.footer-dept),
+html.app-mode body.dlo-app-subpage.light-mode footer .footer-inner > div:not(.footer-dept),
+html[data-theme="dark"]:not(.app-mode) body footer .footer-inner > div:not(.footer-dept),
+html.app-mode body.dlo-app-subpage:not(.light-mode) footer .footer-inner > div:not(.footer-dept) {
+  color:rgba(255,255,255,.68) !important
+}
+html[data-theme="light"]:not(.app-mode) body [style*="background:#FEE2E2"],
+html.app-mode body.dlo-app-subpage.light-mode [style*="background:#FEE2E2"],
+html[data-theme="dark"]:not(.app-mode) body [style*="background:#FEE2E2"],
+html.app-mode body.dlo-app-subpage:not(.light-mode) [style*="background:#FEE2E2"] {
+  color:#b91c1c !important
+}
+html[data-theme="light"]:not(.app-mode) body .filter-box,
+html[data-theme="light"]:not(.app-mode) body .popup-header,
+html.app-mode body.dlo-app-subpage.light-mode .filter-box,
+html.app-mode body.dlo-app-subpage.light-mode .popup-header {
+  background-color:var(--navy) !important;
+  border-color:transparent !important
+}
+html[data-theme="light"]:not(.app-mode) body .filter-box .filter-title,
+html[data-theme="light"]:not(.app-mode) body .filter-box :is(h1,h2,h3),
+html[data-theme="light"]:not(.app-mode) body .popup-header :is(h1,h2,h3),
+html[data-theme="light"]:not(.app-mode) body .page-header :is(h1,h2,h3,.page-title),
+html[data-theme="light"]:not(.app-mode) body [style*="background:var(--navy)"] :is(h1,h2,h3),
+html.app-mode body.dlo-app-subpage.light-mode .filter-box .filter-title,
+html.app-mode body.dlo-app-subpage.light-mode .filter-box :is(h1,h2,h3),
+html.app-mode body.dlo-app-subpage.light-mode .popup-header :is(h1,h2,h3),
+html.app-mode body.dlo-app-subpage.light-mode .page-header :is(h1,h2,h3,.page-title),
+html.app-mode body.dlo-app-subpage.light-mode [style*="background:var(--navy)"] :is(h1,h2,h3) {
+  color:#ffffff !important
+}
+html[data-theme="light"]:not(.app-mode) body .filter-box label,
+html.app-mode body.dlo-app-subpage.light-mode .filter-box label {
+  color:var(--gold-light,#E0BC6E) !important
+}
+html[data-theme="light"]:not(.app-mode) body .page-header :is(p,span),
+html[data-theme="light"]:not(.app-mode) body [style*="background:var(--navy)"] p,
+html.app-mode body.dlo-app-subpage.light-mode .page-header :is(p,span),
+html.app-mode body.dlo-app-subpage.light-mode [style*="background:var(--navy)"] p {
+  color:rgba(255,255,255,.8) !important
+}
+html[data-theme="light"]:not(.app-mode) body .filter-btn.btn-clear:not(.filter-box *),
+html.app-mode body.dlo-app-subpage.light-mode .filter-btn.btn-clear:not(.filter-box *) {
+  color:var(--navy) !important;
+  background-color:rgba(11,37,69,.08) !important;
+  border:1px solid rgba(11,37,69,.28) !important
+}
+html[data-theme="light"]:not(.app-mode) body #histCaseTitle,
+html.app-mode body.dlo-app-subpage.light-mode #histCaseTitle {
+  color:#ffffff !important
+}
+html[data-theme="light"]:not(.app-mode) body .progress-label,
+html.app-mode body.dlo-app-subpage.light-mode .progress-label,
+html[data-theme="dark"]:not(.app-mode) body .progress-label,
+html.app-mode body.dlo-app-subpage:not(.light-mode) .progress-label {
+  text-shadow:0 1px 2px rgba(0,0,0,.55)
+}
+html[data-theme="light"]:not(.app-mode) body .section-eyebrow,
+html[data-theme="light"]:not(.app-mode) body .hist-back-btn,
+html[data-theme="light"]:not(.app-mode) body .lbl,
+html[data-theme="light"]:not(.app-mode) body label:not(.filter-box *):not(.page-header *):not(.case-filter-card *):not([style*="background:var(--navy)"] *),
+html[data-theme="light"]:not(.app-mode) body [style*="color:var(--gold)"]:not(.filter-box *):not(.page-header *):not(.case-filter-card *):not([style*="background:var(--navy)"] *),
+html[data-theme="light"]:not(.app-mode) body [style*="color:var(--gold-light)"]:not(.filter-box *):not(.page-header *):not(.case-filter-card *):not([style*="background:var(--navy)"] *),
+html[data-theme="light"]:not(.app-mode) body [style*="color:#C9A24A"]:not(.filter-box *):not(.page-header *):not(.case-filter-card *):not([style*="background:var(--navy)"] *),
+html.app-mode body.dlo-app-subpage.light-mode .section-eyebrow,
+html.app-mode body.dlo-app-subpage.light-mode .hist-back-btn,
+html.app-mode body.dlo-app-subpage.light-mode .lbl,
+html.app-mode body.dlo-app-subpage.light-mode label:not(.filter-box *):not(.page-header *):not(.case-filter-card *):not([style*="background:var(--navy)"] *),
+html.app-mode body.dlo-app-subpage.light-mode [style*="color:var(--gold)"]:not(.filter-box *):not(.page-header *):not(.case-filter-card *):not([style*="background:var(--navy)"] *),
+html.app-mode body.dlo-app-subpage.light-mode [style*="color:var(--gold-light)"]:not(.filter-box *):not(.page-header *):not(.case-filter-card *):not([style*="background:var(--navy)"] *),
+html.app-mode body.dlo-app-subpage.light-mode [style*="color:#C9A24A"]:not(.filter-box *):not(.page-header *):not(.case-filter-card *):not([style*="background:var(--navy)"] *) {
+  color:#7a5a14 !important
+}
+html[data-theme="dark"]:not(.app-mode) body :is(.analytics-section,.hearings-section,.cause-list-section,.courts-section,.live-section,.about,.services,#calendar):not(#updates),
+html.app-mode body.dlo-app-subpage:not(.light-mode) :is(.analytics-section,.hearings-section,.cause-list-section,.courts-section,.live-section,.about,.services,#calendar):not(#updates) {
+  background-color:var(--dlo-page-bg) !important
+}
+html[data-theme="dark"]:not(.app-mode) body .hrf-stat,
+html[data-theme="dark"]:not(.app-mode) body .hist-summary-grid,
+html[data-theme="dark"]:not(.app-mode) body .hist-prompt,
+html[data-theme="dark"]:not(.app-mode) body .about-feature,
+html[data-theme="dark"]:not(.app-mode) body #causeListContent > div:not([style*="background:var(--navy)"]),
+html[data-theme="dark"]:not(.app-mode) body #calendar .container > .reveal:has(.cal-header),
+html.app-mode body.dlo-app-subpage:not(.light-mode) .hrf-stat,
+html.app-mode body.dlo-app-subpage:not(.light-mode) .hist-summary-grid,
+html.app-mode body.dlo-app-subpage:not(.light-mode) .hist-prompt,
+html.app-mode body.dlo-app-subpage:not(.light-mode) .about-feature,
+html.app-mode body.dlo-app-subpage:not(.light-mode) #causeListContent > div:not([style*="background:var(--navy)"]),
+html.app-mode body.dlo-app-subpage:not(.light-mode) #calendar .container > .reveal:has(.cal-header) {
+  background-color:var(--dlo-panel-bg) !important;
+  color:var(--dlo-page-text) !important;
+  border-color:var(--dlo-border) !important
+}
+html[data-theme="dark"]:not(.app-mode) body thead tr,
+html[data-theme="dark"]:not(.app-mode) body [style*="background:#F9F6EF" i],
+html[data-theme="dark"]:not(.app-mode) body :is(.dept-table,.results-table,.courts-table) tr:nth-child(even) td,
+html.app-mode body.dlo-app-subpage:not(.light-mode) thead tr,
+html.app-mode body.dlo-app-subpage:not(.light-mode) [style*="background:#F9F6EF" i],
+html.app-mode body.dlo-app-subpage:not(.light-mode) :is(.dept-table,.results-table,.courts-table) tr:nth-child(even) td {
+  background-color:var(--dlo-panel-raised) !important
+}
+html[data-theme="dark"]:not(.app-mode) body :is(.dept-table,.results-table,.courts-table) td,
+html.app-mode body.dlo-app-subpage:not(.light-mode) :is(.dept-table,.results-table,.courts-table) td {
+  color:var(--dlo-page-text) !important
+}
+html[data-theme="dark"]:not(.app-mode) body [style*="color:var(--navy-mid)"],
+html[data-theme="dark"]:not(.app-mode) body [style*="color:var(--navy)"]:not([style*="background"]),
+html[data-theme="dark"]:not(.app-mode) body [style*="color:#13315C"],
+html[data-theme="dark"]:not(.app-mode) body #perfSummaryTotal,
+html[data-theme="dark"]:not(.app-mode) body #histStatTotal,
+html[data-theme="dark"]:not(.app-mode) body #calMonthLabel,
+html.app-mode body.dlo-app-subpage:not(.light-mode) [style*="color:var(--navy-mid)"],
+html.app-mode body.dlo-app-subpage:not(.light-mode) [style*="color:var(--navy)"]:not([style*="background"]),
+html.app-mode body.dlo-app-subpage:not(.light-mode) [style*="color:#13315C"],
+html.app-mode body.dlo-app-subpage:not(.light-mode) #perfSummaryTotal,
+html.app-mode body.dlo-app-subpage:not(.light-mode) #histStatTotal,
+html.app-mode body.dlo-app-subpage:not(.light-mode) #calMonthLabel {
+  color:var(--dlo-heading) !important
+}
+html[data-theme="dark"]:not(.app-mode) body [style*="color:#8B1A1A"],
+html[data-theme="dark"]:not(.app-mode) body [style*="color:var(--disposed-fg)"]:not([style*="background"]),
+html[data-theme="dark"]:not(.app-mode) body [style*="color:#C81E1E"]:not([style*="background"]),
+html[data-theme="dark"]:not(.app-mode) body #hrfNotFiled,
+html[data-theme="dark"]:not(.app-mode) body #perfSummaryExparte,
+html[data-theme="dark"]:not(.app-mode) body #histStatExparte,
+html[data-theme="dark"]:not(.app-mode) body #histStatNotAttended,
+html.app-mode body.dlo-app-subpage:not(.light-mode) [style*="color:#8B1A1A"],
+html.app-mode body.dlo-app-subpage:not(.light-mode) [style*="color:var(--disposed-fg)"]:not([style*="background"]),
+html.app-mode body.dlo-app-subpage:not(.light-mode) [style*="color:#C81E1E"]:not([style*="background"]),
+html.app-mode body.dlo-app-subpage:not(.light-mode) #hrfNotFiled,
+html.app-mode body.dlo-app-subpage:not(.light-mode) #perfSummaryExparte,
+html.app-mode body.dlo-app-subpage:not(.light-mode) #histStatExparte,
+html.app-mode body.dlo-app-subpage:not(.light-mode) #histStatNotAttended {
+  color:#ff9a9a !important
+}
+html[data-theme="dark"]:not(.app-mode) body [style*="color:#1E6B45"]:not([style*="background"]),
+html[data-theme="dark"]:not(.app-mode) body [style*="color:var(--active-fg)"]:not([style*="background"]),
+html[data-theme="dark"]:not(.app-mode) body td.hist-business-date,
+html.app-mode body.dlo-app-subpage:not(.light-mode) [style*="color:#1E6B45"]:not([style*="background"]),
+html.app-mode body.dlo-app-subpage:not(.light-mode) [style*="color:var(--active-fg)"]:not([style*="background"]),
+html.app-mode body.dlo-app-subpage:not(.light-mode) td.hist-business-date {
+  color:#6ee7a8 !important
+}
+/* App dashboard (app.html, light): alert and gold arrows were still dark-theme values. */
+html.app-mode body.light-mode .app-home-alert { color:#7a1b25; border-color:rgba(139,35,45,.35); background:rgba(139,35,45,.1); }
+html.app-mode body.light-mode .app-group-heading > p span { color:#8a6516; }
+html.app-mode body.light-mode .app-action-featured .app-action-arrow { color:#8a6516; border-color:rgba(138,101,22,.4); }
+html.app-mode body.light-mode .app-action-metrics > span { color:#4d6580; }
+html.app-mode body.light-mode .app-action-metrics b { color:#066a7e; }
+html.app-mode body.light-mode .app-action-metrics > span:nth-child(2) b { color:#136c42; }
+html.app-mode body.light-mode .app-action-metrics > span:nth-child(3) b { color:#80600f; }
+/* App dashboard (light): near-threshold stat colours and arrows. */
+html.app-mode body.light-mode #appMainActive { color: #0a5d6e; }
+html.app-mode body.light-mode #appMainPending { color: #7a5a14; }
+html.app-mode body.light-mode .app-action-metrics > span { color: #46597a !important; }
+html.app-mode body.light-mode .app-action-card .app-action-arrow { color: #7d5a12 !important; }
+/* Placeholder text was invisible on light inputs inside navy filter panels (light theme). */
+html[data-theme="light"]:not(.app-mode) body :is(input, textarea)::placeholder,
+html.app-mode body.light-mode :is(input, textarea)::placeholder { color: #66758b !important; opacity: 1; }
+html[data-theme="dark"]:not(.app-mode) body :is(input, textarea)::placeholder,
+html.app-mode body:not(.light-mode) :is(input, textarea)::placeholder { color: #9fb0c6 !important; opacity: 1; }
+/* Analytics disposal bar: white label on the green fill was 3.8:1; darker text of the same weight/size. */
+html[data-theme] body .progress-label,
+html.app-mode body.dlo-app-subpage .progress-label { color: #04210f !important; }

@@ -447,6 +447,22 @@
     .case-results-table tbody tr:hover { background: #fcf8ed; }
     .case-footer { border-top-color: #102949; background: #102949; color: #e0e7f0; }
     .case-error { color: #a63832 !important; }
+    /* Theme readability: the light layer above hardcodes colours that clash with the
+       panel/heading colours menu.css forces in each theme. Corrections only. */
+    html[data-theme="dark"] .case-message { background: var(--case-panel); border-color: var(--case-line); }
+    html[data-theme="dark"] .case-search-label,
+    html[data-theme="dark"] #loadingResults,
+    html[data-theme="dark"] .case-results-count { color: var(--case-text); }
+    html[data-theme="dark"] .case-results-count strong,
+    html[data-theme="dark"] .case-eyebrow { color: var(--case-gold-soft); }
+    html[data-theme="dark"] .case-clear-search,
+    html[data-theme="dark"] .case-help { color: var(--case-muted); }
+    html[data-theme="dark"] .case-secondary-button { background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.28); color: var(--case-text); }
+    html[data-theme="light"] body #filtersHeading { color: #ffffff !important; }
+    html[data-theme="light"] .case-eyebrow { color: #7a5a14; }
+    html[data-theme="light"] body .case-heading p { color: #4b5b70 !important; }
+    html[data-theme="light"] .case-search-icon { color: #8a6516; }
+    html[data-theme="light"] .case-results-count strong { color: #7a5a14; }
     @media (min-width: 901px) { .case-filter-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
   </style>
 </head>
@@ -572,7 +588,9 @@
       if (!window.DLO) return;
       DLO.registerSW();
 
-      var PAGE_SIZE = 100;
+      var CHUNK_SIZE = 100;      // rows fetched per request; Next/Previous move through them locally
+      var EXPORT_PAGE_SIZE = 100; // the original page size: what "Download this page (CSV)" has always covered
+      var PREFETCH_AHEAD = 10;   // fetch the next chunk when this close to the end of the current one
       var MIN_SEARCH_CHARACTERS = 4;
       var SEARCH_FIELDS = [
         'cnr_case_no', 'case_title', 'subject_matter', 'department', 'court_name',
@@ -606,11 +624,27 @@
       var nextPageBtn = document.getElementById('nextPageBtn');
       var filterHint = document.getElementById('filterHint');
       var lastSearchTerm = '';
-      var currentPage = 0;
+      var currentIndex = 0;      // 0-based position of the case being shown
       var totalCount = 0;
-      var currentRows = [];
+      var chunks = {};           // chunk index -> mapped rows already fetched for the current search
+      var chunkPromises = {};    // chunk index -> in-flight request
+      var currentTerm = '';
+      var currentFilters = {};
       var filterOptionsReady = false;
       var activeRequest = 0;
+      var searchAbort = null;
+      var optionsAbort = null;
+      var optionsSeq = 0;
+
+      function abortInFlight() {
+        if (searchAbort) { try { searchAbort.abort(); } catch (e) {} }
+        searchAbort = null;
+      }
+      function invalidateOptions() {
+        optionsSeq++;
+        if (optionsAbort) { try { optionsAbort.abort(); } catch (e) {} }
+        optionsAbort = null;
+      }
 
       function showPrompt(title, message, isError) {
         filterPrompt.hidden = false;
@@ -639,6 +673,7 @@
       }
 
       function clearFilterOptions() {
+        invalidateOptions();
         filterDefinitions.forEach(function (definition) {
           var select = document.getElementById(definition.id);
           select.replaceChildren(new Option(definition.placeholder, ''));
@@ -646,14 +681,11 @@
         filterOptionsReady = false;
       }
 
-      function populateFilterOptions(rows) {
+      function applyFilterOptionMap(map) {
         filterDefinitions.forEach(function (definition) {
           var select = document.getElementById(definition.id);
           var previousValue = select.value;
-          var values = Array.from(new Set(rows
-            .map(function (row) { return String(row[definition.column] || '').trim(); })
-            .filter(Boolean)));
-          values.sort(function (a, b) { return a.localeCompare(b, undefined, { sensitivity: 'base' }); });
+          var values = map[definition.column] || [];
           select.replaceChildren(new Option(definition.placeholder, ''));
           values.forEach(function (value) {
             select.add(new Option(value, value));
@@ -661,6 +693,35 @@
           if (values.indexOf(previousValue) !== -1) select.value = previousValue;
         });
         filterOptionsReady = true;
+      }
+
+      // Options from the rows already fetched (complete when every match fit in one chunk).
+      function populateFilterOptions(rows) {
+        var map = {};
+        filterDefinitions.forEach(function (definition) {
+          var values = Array.from(new Set(rows
+            .map(function (row) { return String(row[definition.column] || '').trim(); })
+            .filter(Boolean)));
+          values.sort(function (a, b) { return a.localeCompare(b, undefined, { sensitivity: 'base' }); });
+          map[definition.column] = values;
+        });
+        applyFilterOptionMap(map);
+      }
+
+      // More matches than one chunk: read every match's filter columns (7 columns,
+      // 1,000 rows per request) so values that only exist beyond the first
+      // chunk still appear. Runs once per search term, in the background.
+      function loadCompleteFilterOptions(term) {
+        invalidateOptions();
+        optionsAbort = new AbortController();
+        var run = optionsSeq;
+        DLO.getDistinctFilterValues(term, optionsAbort.signal).then(function (map) {
+          if (run !== optionsSeq) return;
+          applyFilterOptionMap(map);
+        }).catch(function (error) {
+          if (run !== optionsSeq) return;
+          console.error('[Search Cases] Could not load the complete filter options:', error);
+        });
       }
 
       function getSearchTerm() {
@@ -680,28 +741,11 @@
         return selected;
       }
 
-      function mapCase(row) {
-        return {
-          cnrCaseNo: row.cnr_case_no || '',
-          caseTitle: row.case_title || '',
-          subjectMatter: row.subject_matter || '',
-          department: row.department || 'Unknown',
-          court: row.court_name || 'Unknown',
-          lastProceedings: row.last_proceedings || '',
-          nextHearing: row.next_hearing_date || null,
-          reply: row.reply_status || '',
-          status: row.case_status || '',
-          type: row.case_type || 'Other',
-          advocateName: row.advocate_name || '',
-          exparte: row.exparte_status || ''
-        };
-      }
-
       function selectedForNewKeyword(term) {
         if (term !== lastSearchTerm) {
           clearSelectedFilters();
           clearFilterOptions();
-          currentPage = 0;
+          currentIndex = 0;
           lastSearchTerm = term;
           return true;
         }
@@ -712,9 +756,10 @@
         var term = getSearchTerm();
         if (getSearchableCharacterCount(term) < MIN_SEARCH_CHARACTERS) {
           activeRequest++;
-          currentRows = [];
+          abortInFlight();
+          chunks = {}; chunkPromises = {};
           totalCount = 0;
-          currentPage = 0;
+          currentIndex = 0;
           clearSelectedFilters();
           clearFilterOptions();
           setFilterControlsEnabled(false);
@@ -729,85 +774,131 @@
         if (!filterOptionsReady && !fromSubmit && lastSearchTerm === term) {
           setFilterControlsEnabled(false);
         }
+        abortInFlight();
+        searchAbort = new AbortController();
         var requestId = ++activeRequest;
         var selectedFilters = getSelectedFilters();
-        currentPage = Math.max(0, page);
+        currentTerm = term;
+        currentFilters = selectedFilters;
+        chunks = {}; chunkPromises = {};
+        currentIndex = 0;
         filterPrompt.hidden = true;
         resultsSection.hidden = true;
         loading.hidden = false;
         setFilterControlsEnabled(false);
 
         try {
-          var client = DLO.getSupabaseClient();
-          if (!client) throw new Error('The case database is unavailable.');
-          var pattern = '%' + term + '%';
-          var orExpression = SEARCH_FIELDS.map(function (column) {
-            return column + '.ilike.' + pattern;
-          }).join(',');
-          var start = currentPage * PAGE_SIZE;
-          var query = client.from('case_diary')
-            .select(SELECT_FIELDS, { count: 'exact' })
-            .or(orExpression);
-          Object.keys(selectedFilters).forEach(function (column) {
-            query = query.eq(column, selectedFilters[column]);
-          });
-          var response = await query
-            .order('cnr_case_no', { ascending: true, nullsFirst: false })
-            .range(start, start + PAGE_SIZE - 1);
+          var result = await DLO.searchCases(term, selectedFilters, 0, CHUNK_SIZE, searchAbort.signal);
           if (requestId !== activeRequest) return;
-          if (response.error) throw response.error;
-
-          var rawRows = response.data || [];
-          currentRows = rawRows.map(mapCase);
-          totalCount = Number.isFinite(response.count) ? response.count : rawRows.length;
-          if (!filterOptionsReady) populateFilterOptions(rawRows);
+          chunks[0] = result.rows;
+          totalCount = result.count;
+          if (!filterOptionsReady) {
+            populateFilterOptions(result.raw);
+            if (totalCount > result.raw.length) loadCompleteFilterOptions(term);
+          }
           setFilterControlsEnabled(true);
           loading.hidden = true;
-          renderResults(currentRows);
+          renderCase();
+          prefetchAhead();
         } catch (error) {
           if (requestId !== activeRequest) return;
           console.error('[Search Cases] Supabase search failed:', error);
           loading.hidden = true;
           setFilterControlsEnabled(!!lastSearchTerm && filterOptionsReady);
-          showPrompt('Search could not be completed', 'Check your connection and Supabase access policy, then try again.', true);
+          if (navigator.onLine === false) {
+            showPrompt('You appear to be offline', 'Reconnect to the internet, then search again.', true);
+          } else {
+            showPrompt('Search could not be completed', 'Check your connection and Supabase access policy, then try again.', true);
+          }
         }
       }
 
-      function renderResults(rows) {
+      // Returns the rows of one chunk, from memory when already fetched.
+      function loadChunk(chunkIndex) {
+        if (chunks[chunkIndex]) return Promise.resolve(chunks[chunkIndex]);
+        if (chunkPromises[chunkIndex]) return chunkPromises[chunkIndex];
+        var gen = activeRequest;
+        var signal = searchAbort ? searchAbort.signal : undefined;
+        var promise = DLO.searchCases(currentTerm, currentFilters, chunkIndex * CHUNK_SIZE, CHUNK_SIZE, signal)
+          .then(function (res) {
+            if (gen === activeRequest) chunks[chunkIndex] = res.rows;
+            return res.rows;
+          })
+          .finally(function () {
+            if (gen === activeRequest) delete chunkPromises[chunkIndex];
+          });
+        chunkPromises[chunkIndex] = promise;
+        return promise;
+      }
+
+      function prefetchAhead() {
+        var next = Math.floor(currentIndex / CHUNK_SIZE) + 1;
+        if (currentIndex % CHUNK_SIZE >= CHUNK_SIZE - PREFETCH_AHEAD && next * CHUNK_SIZE < totalCount) {
+          loadChunk(next).catch(function () {});
+        }
+      }
+
+      async function showCase(index) {
+        if (index < 0 || index >= totalCount) return;
+        var gen = activeRequest;
+        var chunkIndex = Math.floor(index / CHUNK_SIZE);
+        if (!chunks[chunkIndex]) {
+          prevPageBtn.disabled = true;
+          nextPageBtn.disabled = true;
+          try {
+            var rows = await loadChunk(chunkIndex);
+            if (gen !== activeRequest) return;
+            if (!rows.length) {
+              totalCount = chunkIndex * CHUNK_SIZE;
+              currentIndex = Math.max(0, totalCount - 1);
+              renderCase();
+              return;
+            }
+          } catch (error) {
+            if (gen !== activeRequest) return;
+            console.error('[Search Cases] Could not load the next case:', error);
+            if (DLO.showToast) DLO.showToast(navigator.onLine === false ? 'You appear to be offline.' : 'Could not load that case. Please try again.', 'error');
+            renderCase();
+            return;
+          }
+        }
+        currentIndex = index;
+        renderCase();
+        prefetchAhead();
+      }
+
+      function renderCase() {
         filterPrompt.hidden = true;
         loading.hidden = true;
         resultsSection.hidden = false;
-        var firstResult = totalCount ? currentPage * PAGE_SIZE + 1 : 0;
-        var lastResult = Math.min((currentPage + 1) * PAGE_SIZE, totalCount);
         resultsCount.innerHTML = totalCount
-          ? 'Showing <strong>' + firstResult + '–' + lastResult + '</strong> of <strong>' + totalCount + '</strong> matching cases'
+          ? '<strong>' + totalCount + '</strong> matching ' + (totalCount === 1 ? 'case' : 'cases')
           : 'No cases matched your search and selected filters.';
-        pageCount.textContent = totalCount ? 'Page ' + (currentPage + 1) + ' of ' + Math.max(1, Math.ceil(totalCount / PAGE_SIZE)) : '';
-        prevPageBtn.disabled = currentPage === 0;
-        nextPageBtn.disabled = lastResult >= totalCount;
+        pageCount.textContent = totalCount ? 'Case ' + (currentIndex + 1) + ' of ' + totalCount : '';
+        prevPageBtn.disabled = currentIndex <= 0;
+        nextPageBtn.disabled = currentIndex >= totalCount - 1;
 
-        if (!rows.length) {
-          resultsBody.innerHTML = '<tr><td colspan="13" style="text-align:center;padding:26px;color:#a9a79f">No cases matched. Try another search term or clear one or more filters.</td></tr>';
+        var rows = chunks[Math.floor(currentIndex / CHUNK_SIZE)] || [];
+        var r = rows[currentIndex % CHUNK_SIZE];
+        if (!r) {
+          resultsBody.innerHTML = '<tr><td colspan="13" style="text-align:center;padding:26px;color:#5b6b80">No cases matched. Try another search term or clear one or more filters.</td></tr>';
           return;
         }
-        resultsBody.innerHTML = rows.map(function (row, index) {
-          var r = row;
-          return '<tr>' +
-            '<td>' + (currentPage * PAGE_SIZE + index + 1) + '</td>' +
-            '<td>' + DLO.escapeHtml(r.cnrCaseNo) + '</td>' +
-            '<td>' + DLO.escapeHtml(r.caseTitle) + '</td>' +
-            '<td>' + DLO.escapeHtml(r.subjectMatter) + '</td>' +
-            '<td>' + DLO.escapeHtml(r.department) + '</td>' +
-            '<td>' + DLO.escapeHtml(r.court) + '</td>' +
-            '<td>' + DLO.escapeHtml(r.lastProceedings) + '</td>' +
-            '<td>' + DLO.formatDDMMYYYY(r.nextHearing) + '</td>' +
-            '<td>' + DLO.escapeHtml(r.reply) + '</td>' +
-            '<td>' + DLO.escapeHtml(r.status) + '</td>' +
-            '<td>' + DLO.escapeHtml(r.type) + '</td>' +
-            '<td>' + DLO.escapeHtml(r.advocateName) + '</td>' +
-            '<td>' + DLO.escapeHtml(r.exparte) + '</td>' +
-            '</tr>';
-        }).join('');
+        resultsBody.innerHTML = '<tr>' +
+          '<td>' + (currentIndex + 1) + '</td>' +
+          '<td>' + DLO.escapeHtml(r.cnrCaseNo) + '</td>' +
+          '<td>' + DLO.escapeHtml(r.caseTitle) + '</td>' +
+          '<td>' + DLO.escapeHtml(r.subjectMatter) + '</td>' +
+          '<td>' + DLO.escapeHtml(r.department) + '</td>' +
+          '<td>' + DLO.escapeHtml(r.court) + '</td>' +
+          '<td>' + DLO.escapeHtml(r.lastProceedings) + '</td>' +
+          '<td>' + DLO.formatDDMMYYYY(r.nextHearing) + '</td>' +
+          '<td>' + DLO.escapeHtml(r.reply) + '</td>' +
+          '<td>' + DLO.escapeHtml(r.status) + '</td>' +
+          '<td>' + DLO.escapeHtml(r.type) + '</td>' +
+          '<td>' + DLO.escapeHtml(r.advocateName) + '</td>' +
+          '<td>' + DLO.escapeHtml(r.exparte) + '</td>' +
+          '</tr>';
       }
 
       form.addEventListener('submit', function (event) {
@@ -818,9 +909,10 @@
         var term = getSearchTerm();
         var enoughCharacters = getSearchableCharacterCount(term) >= MIN_SEARCH_CHARACTERS;
         activeRequest++;
-        currentRows = [];
+        abortInFlight();
+        chunks = {}; chunkPromises = {};
         totalCount = 0;
-        currentPage = 0;
+        currentIndex = 0;
         clearSelectedFilters();
         clearFilterOptions();
         setFilterControlsEnabled(false);
@@ -841,12 +933,13 @@
       });
       document.getElementById('clearSearchBtn').addEventListener('click', function () {
         activeRequest++;
+        abortInFlight();
         searchInput.value = '';
         lastSearchTerm = '';
         searchButton.disabled = true;
-        currentPage = 0;
+        currentIndex = 0;
         totalCount = 0;
-        currentRows = [];
+        chunks = {}; chunkPromises = {};
         clearSelectedFilters();
         clearFilterOptions();
         setFilterControlsEnabled(false);
@@ -855,17 +948,38 @@
         searchInput.focus();
       });
       prevPageBtn.addEventListener('click', function () {
-        if (currentPage > 0) runSearch(currentPage - 1, false);
+        if (currentIndex > 0) showCase(currentIndex - 1);
       });
       nextPageBtn.addEventListener('click', function () {
-        if ((currentPage + 1) * PAGE_SIZE < totalCount) runSearch(currentPage + 1, false);
+        if (currentIndex < totalCount - 1) showCase(currentIndex + 1);
       });
 
-      document.getElementById('exportExcelBtn').addEventListener('click', function () {
+      document.getElementById('exportExcelBtn').addEventListener('click', async function () {
+        // Same content as the old "page" export: the block of up to EXPORT_PAGE_SIZE results
+        // (the old page size, independent of the internal fetch chunk) that contains the
+        // case on screen, numbered by its position in the full result list.
+        var exportStart = Math.floor(currentIndex / EXPORT_PAGE_SIZE) * EXPORT_PAGE_SIZE;
+        var exportEnd = Math.min(exportStart + EXPORT_PAGE_SIZE, totalCount);
+        var gen = activeRequest;
+        var currentRows = [];
+        try {
+          for (var ci = Math.floor(exportStart / CHUNK_SIZE); ci <= Math.floor((exportEnd - 1) / CHUNK_SIZE); ci++) {
+            var chunkRows = await loadChunk(ci);
+            if (gen !== activeRequest) return;
+            for (var k = 0; k < chunkRows.length; k++) {
+              var position = ci * CHUNK_SIZE + k;
+              if (position >= exportStart && position < exportEnd) currentRows.push(chunkRows[k]);
+            }
+          }
+        } catch (error) {
+          console.error('[Search Cases] CSV export failed:', error);
+          if (DLO.showToast) DLO.showToast('Could not prepare the download. Please try again.', 'error');
+          return;
+        }
         if (!currentRows.length) return;
         var header = ['#','Case No','Title','Subject','Department','Court','Last Proceedings','Next Hearing','Reply','Status','Type','Counsel','Ex-parte'];
         var csvRows = currentRows.map(function (r, i) {
-          var values = [currentPage * PAGE_SIZE + i + 1, r.cnrCaseNo, r.caseTitle, r.subjectMatter, r.department, r.court,
+          var values = [exportStart + i + 1, r.cnrCaseNo, r.caseTitle, r.subjectMatter, r.department, r.court,
             r.lastProceedings, DLO.formatDDMMYYYY(r.nextHearing), r.reply, r.status, r.type, r.advocateName, r.exparte];
           return values.map(function (value) {
             return '"' + String(value || '').replace(/"/g, '""') + '"';
