@@ -133,13 +133,21 @@ div[style*="overflow-x: auto"]::-webkit-scrollbar-track{
      longer shown on the home page itself to avoid piling everything
      onto a single page. -->
 <style>#hearings,#history{display:none!important}</style>
-<style id="dlo-theme-fix-causelist">
-/* Daily Cause List — dark-theme readability only (no layout, spacing or content change).
-   The cause-list wrapper, header row and zebra rows are painted with fixed light colours
-   (var(--white), var(--cream), #F9F6EF) while the shared theme turns their text light, giving
-   light text on a white card. These rules re-point only those colours at the existing
-   --dlo-* theme tokens when the dark theme is active, whichever mode (website / installed app)
-   or load order applies. Light theme is untouched. */
+<style id="dlo-theme-fix-causelist" data-v="3">
+/* Daily Cause List — theme readability only (no layout, spacing, data, filter or ordering change).
+   Cause: the cause-list card (#causeListContent) is painted by INLINE styles with fixed light
+   colours — background:var(--white) on the card, background:var(--cream) on the header row,
+   background:#F9F6EF on alternate rows, color:var(--navy-mid)/var(--navy) on headings and case
+   numbers, #1E6B45 / #8B1A1A on Filed / Not Filed — while the text inherits the dark theme's
+   light colour. The shared menu.css repaints them only under
+   `html[data-theme="dark"]:not(.app-mode) body` or `html.app-mode body.dlo-app-subpage:not(.light-mode)`,
+   so whenever <html> is in dark theme but <html>/<body> carry any other combination of
+   app-mode / dlo-app-subpage / light-mode classes, nothing repaints: a white card with pale text.
+   Fix: in dark theme, repaint the card from <html data-theme="dark"> alone (the value that also decides
+   the text colour), so the two can never disagree. Every rule is under html[data-theme="dark"]; light
+   theme is not touched, so it renders exactly as before. */
+
+/* ── Dark theme ─────────────────────────────────────────────── */
 html[data-theme="dark"] #causeListContent > div:not([style*="background:var(--navy)"]) {
   background-color: var(--dlo-panel-bg, #122238) !important;
   border-color: var(--dlo-border, rgba(224,192,131,.18)) !important;
@@ -148,15 +156,34 @@ html[data-theme="dark"] #causeListContent #causeListTable thead tr,
 html[data-theme="dark"] #causeListContent #causeListTable tbody tr[style*="background"] {
   background-color: var(--dlo-panel-raised, #182d45) !important;
 }
-html[data-theme="dark"] #causeListContent #causeListTable td {
-  color: var(--dlo-page-text, #e5edf6) !important;
-}
-html[data-theme="dark"] #causeListContent #causeListTable th,
-html[data-theme="dark"] #causeListContent #causeListTable td[style*="color:var(--navy)"] {
+html[data-theme="dark"] #causeListContent #causeListTable th {
   color: var(--dlo-heading, #f1f5f9) !important;
+  border-bottom-color: var(--dlo-border, rgba(224,192,131,.18)) !important;
 }
-html[data-theme="dark"] #causeListContent #causeListTable span[style*="#1E6B45" i] { color: #6ee7a8 !important; }
-html[data-theme="dark"] #causeListContent #causeListTable span[style*="#8B1A1A" i] { color: #ff9a9a !important; }
+html[data-theme="dark"] #causeListContent #causeListTable td { color: var(--dlo-page-text, #e5edf6) !important; }
+html[data-theme="dark"] #causeListContent #causeListTable td[style*="color:var(--navy)"] { color: var(--dlo-heading, #f1f5f9) !important; }
+html[data-theme="dark"] #causeListContent #causeListTable span[style*="#1E6B45" i] { color: #6ee7a8 !important; }  /* Filed */
+html[data-theme="dark"] #causeListContent #causeListTable span[style*="#8B1A1A" i] { color: #ff9a9a !important; }  /* Not Filed */
+</style>
+<style id="dlo-theme-fix-causelist-calendar">
+/* Daily Cause List — dark-theme readability for the panel that opens under the calendar when a
+   date is clicked (#calDayDetails: heading #calDayTitle + rows in #calDayList). Theme only: no
+   layout, spacing, data, ordering or behaviour change; light theme is not touched.
+   The panel is painted by an inline background:var(--white) and sits in the calendar section, not
+   inside #causeListContent, and no shared rule repaints it, so in dark theme it stayed white while
+   its text turned light. Text colours are set here as well so the panel is readable whichever
+   app-mode / subpage classes are present. */
+html[data-theme="dark"] #calDayDetails {
+  background-color: var(--dlo-panel-bg, #122238) !important;
+  border-color: var(--dlo-border, rgba(224,192,131,.18)) !important;
+}
+html[data-theme="dark"] #calDayDetails #calDayTitle { color: var(--dlo-heading, #f1f5f9) !important; }
+html[data-theme="dark"] #calDayDetails #calDayList { color: var(--dlo-page-text, #e5edf6) !important; }
+html[data-theme="dark"] #calDayDetails #calDayList > div { border-bottom-color: var(--dlo-border, rgba(224,192,131,.18)) !important; }
+html[data-theme="dark"] #calDayDetails #calDayList strong { color: var(--dlo-heading, #f1f5f9) !important; }
+html[data-theme="dark"] #calDayDetails #calDayList span[style*="color:var(--muted)"] { color: var(--dlo-muted, #aab8c9) !important; }
+html[data-theme="dark"] #calDayDetails #calDayList span[style*="#1E6B45" i] { color: #6ee7a8 !important; }  /* Filed */
+html[data-theme="dark"] #calDayDetails #calDayList span[style*="#8B1A1A" i] { color: #ff9a9a !important; }  /* Not Filed */
 </style>
 </head>
 <body>
