@@ -133,6 +133,31 @@ div[style*="overflow-x: auto"]::-webkit-scrollbar-track{
      longer shown on the home page itself to avoid piling everything
      onto a single page. -->
 <style>#hearings,#history{display:none!important}</style>
+<style id="dlo-theme-fix-causelist">
+/* Daily Cause List — dark-theme readability only (no layout, spacing or content change).
+   The cause-list wrapper, header row and zebra rows are painted with fixed light colours
+   (var(--white), var(--cream), #F9F6EF) while the shared theme turns their text light, giving
+   light text on a white card. These rules re-point only those colours at the existing
+   --dlo-* theme tokens when the dark theme is active, whichever mode (website / installed app)
+   or load order applies. Light theme is untouched. */
+html[data-theme="dark"] #causeListContent > div:not([style*="background:var(--navy)"]) {
+  background-color: var(--dlo-panel-bg, #122238) !important;
+  border-color: var(--dlo-border, rgba(224,192,131,.18)) !important;
+}
+html[data-theme="dark"] #causeListContent #causeListTable thead tr,
+html[data-theme="dark"] #causeListContent #causeListTable tbody tr[style*="background"] {
+  background-color: var(--dlo-panel-raised, #182d45) !important;
+}
+html[data-theme="dark"] #causeListContent #causeListTable td {
+  color: var(--dlo-page-text, #e5edf6) !important;
+}
+html[data-theme="dark"] #causeListContent #causeListTable th,
+html[data-theme="dark"] #causeListContent #causeListTable td[style*="color:var(--navy)"] {
+  color: var(--dlo-heading, #f1f5f9) !important;
+}
+html[data-theme="dark"] #causeListContent #causeListTable span[style*="#1E6B45" i] { color: #6ee7a8 !important; }
+html[data-theme="dark"] #causeListContent #causeListTable span[style*="#8B1A1A" i] { color: #ff9a9a !important; }
+</style>
 </head>
 <body>
 <script>DLO.injectMenu();</script>

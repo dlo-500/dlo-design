@@ -24,6 +24,25 @@
 <meta property="og:description" content="Distribution of cases across courts under District Litigation Office Kupwara">
 <meta property="og:type" content="website">
 <meta name="robots" content="index,follow">
+<style id="dlo-theme-fix-court-wise">
+/* Court-wise Case Distribution — dark-theme readability only (no layout, data or chart change).
+   The "Case Distribution" card is painted with var(--surface), which is not themed (always
+   near-white), while its heading, caption and legend text use the themed --text/--muted
+   (light in dark theme) — so they vanish. Re-point the card at the existing --dlo-* panel
+   tokens in dark theme. The navy (#0A1F3D) slice and legend dot would otherwise merge into the
+   dark card, so they get a thin light outline; chart colours themselves are unchanged. */
+html[data-theme="dark"] #courts div[style*="background:var(--surface)"] {
+  background-color: var(--dlo-panel-bg, #122238) !important;
+  border-color: var(--dlo-border, rgba(224,192,131,.18)) !important;
+}
+html[data-theme="dark"] #courts div[style*="background:var(--surface)"] h3 {
+  color: var(--dlo-heading, #f1f5f9) !important;
+}
+html[data-theme="dark"] #courts #chartLegend > div { color: var(--dlo-page-text, #e5edf6) !important; }
+html[data-theme="dark"] #courts #chartLegend > div > span:last-child { color: var(--dlo-muted, #aab8c9) !important; }
+html[data-theme="dark"] #courts #chartLegend span[style*="background:#0A1F3D" i] { box-shadow: 0 0 0 1px rgba(255,255,255,.6); }
+html[data-theme="dark"] #courts #courtChart { filter: drop-shadow(0 0 1px rgba(255,255,255,.55)); }
+</style>
 </head>
 <body>
 <script>DLO.injectMenu();</script>
