@@ -133,6 +133,58 @@ div[style*="overflow-x: auto"]::-webkit-scrollbar-track{
      longer shown on the home page itself to avoid piling everything
      onto a single page. -->
 <style>#hearings,#history{display:none!important}</style>
+<style id="dlo-theme-fix-causelist" data-v="3">
+/* Daily Cause List — theme readability only (no layout, spacing, data, filter or ordering change).
+   Cause: the cause-list card (#causeListContent) is painted by INLINE styles with fixed light
+   colours — background:var(--white) on the card, background:var(--cream) on the header row,
+   background:#F9F6EF on alternate rows, color:var(--navy-mid)/var(--navy) on headings and case
+   numbers, #1E6B45 / #8B1A1A on Filed / Not Filed — while the text inherits the dark theme's
+   light colour. The shared menu.css repaints them only under
+   `html[data-theme="dark"]:not(.app-mode) body` or `html.app-mode body.dlo-app-subpage:not(.light-mode)`,
+   so whenever <html> is in dark theme but <html>/<body> carry any other combination of
+   app-mode / dlo-app-subpage / light-mode classes, nothing repaints: a white card with pale text.
+   Fix: in dark theme, repaint the card from <html data-theme="dark"> alone (the value that also decides
+   the text colour), so the two can never disagree. Every rule is under html[data-theme="dark"]; light
+   theme is not touched, so it renders exactly as before. */
+
+/* ── Dark theme ─────────────────────────────────────────────── */
+html[data-theme="dark"] #causeListContent > div:not([style*="background:var(--navy)"]) {
+  background-color: var(--dlo-panel-bg, #122238) !important;
+  border-color: var(--dlo-border, rgba(224,192,131,.18)) !important;
+}
+html[data-theme="dark"] #causeListContent #causeListTable thead tr,
+html[data-theme="dark"] #causeListContent #causeListTable tbody tr[style*="background"] {
+  background-color: var(--dlo-panel-raised, #182d45) !important;
+}
+html[data-theme="dark"] #causeListContent #causeListTable th {
+  color: var(--dlo-heading, #f1f5f9) !important;
+  border-bottom-color: var(--dlo-border, rgba(224,192,131,.18)) !important;
+}
+html[data-theme="dark"] #causeListContent #causeListTable td { color: var(--dlo-page-text, #e5edf6) !important; }
+html[data-theme="dark"] #causeListContent #causeListTable td[style*="color:var(--navy)"] { color: var(--dlo-heading, #f1f5f9) !important; }
+html[data-theme="dark"] #causeListContent #causeListTable span[style*="#1E6B45" i] { color: #6ee7a8 !important; }  /* Filed */
+html[data-theme="dark"] #causeListContent #causeListTable span[style*="#8B1A1A" i] { color: #ff9a9a !important; }  /* Not Filed */
+</style>
+<style id="dlo-theme-fix-causelist-calendar">
+/* Daily Cause List — dark-theme readability for the panel that opens under the calendar when a
+   date is clicked (#calDayDetails: heading #calDayTitle + rows in #calDayList). Theme only: no
+   layout, spacing, data, ordering or behaviour change; light theme is not touched.
+   The panel is painted by an inline background:var(--white) and sits in the calendar section, not
+   inside #causeListContent, and no shared rule repaints it, so in dark theme it stayed white while
+   its text turned light. Text colours are set here as well so the panel is readable whichever
+   app-mode / subpage classes are present. */
+html[data-theme="dark"] #calDayDetails {
+  background-color: var(--dlo-panel-bg, #122238) !important;
+  border-color: var(--dlo-border, rgba(224,192,131,.18)) !important;
+}
+html[data-theme="dark"] #calDayDetails #calDayTitle { color: var(--dlo-heading, #f1f5f9) !important; }
+html[data-theme="dark"] #calDayDetails #calDayList { color: var(--dlo-page-text, #e5edf6) !important; }
+html[data-theme="dark"] #calDayDetails #calDayList > div { border-bottom-color: var(--dlo-border, rgba(224,192,131,.18)) !important; }
+html[data-theme="dark"] #calDayDetails #calDayList strong { color: var(--dlo-heading, #f1f5f9) !important; }
+html[data-theme="dark"] #calDayDetails #calDayList span[style*="color:var(--muted)"] { color: var(--dlo-muted, #aab8c9) !important; }
+html[data-theme="dark"] #calDayDetails #calDayList span[style*="#1E6B45" i] { color: #6ee7a8 !important; }  /* Filed */
+html[data-theme="dark"] #calDayDetails #calDayList span[style*="#8B1A1A" i] { color: #ff9a9a !important; }  /* Not Filed */
+</style>
 </head>
 <body>
 <script>DLO.injectMenu();</script>
@@ -1043,10 +1095,31 @@ function nowIST() {
 // ═══════════════════════════════════════════════
 //  FETCH CASE DIARY (from Supabase, was Google Sheets)
 // ═══════════════════════════════════════════════
+// Reads every row, page by page. A bare select() is capped by the API (1,000
+// rows by default) and would silently drop the rest. `make(first)` builds the
+// query (with its existing ordering); the exact count is requested once.
+async function pagedAll(make) {
+  const PAGE = 1000, rows = [];
+  let total = null;
+  for (let from = 0; ; ) {
+    const res = await make(from === 0).range(from, from + PAGE - 1);
+    if (res.error) throw res.error;
+    const data = res.data || [];
+    if (from === 0 && Number.isFinite(res.count)) total = res.count;
+    rows.push.apply(rows, data);
+    from += data.length;
+    if (!data.length || (total !== null ? rows.length >= total : data.length < PAGE)) break;
+  }
+  return rows;
+}
+const CASE_DIARY_COLUMNS = 's_no,cnr_case_no,case_title,subject_matter,department,court_name,last_proceedings,next_hearing_date,reply_status,case_status,case_type,advocate_name,exparte_status';
+const CASE_HISTORY_COLUMNS = 'created_at,hearing_date,proceedings_summary,advocate_name,attendance,case_diary(case_title, cnr_case_no, department, court_name, exparte_status, case_status)';
+
 async function fetchSheetData() {
   try {
-    const { data, error } = await sb.from('case_diary').select('*').order('s_no');
-    if (error) throw error;
+    const data = await pagedAll(first => sb.from('case_diary')
+      .select(CASE_DIARY_COLUMNS, first ? { count: 'exact' } : undefined)
+      .order('s_no'));
 
     ALL_ROWS = (data || []).map(r => ({
       sr:          r.s_no != null ? String(r.s_no) : '',
@@ -1082,11 +1155,15 @@ function escapeHtml(val) {
 // ═══════════════════════════════════════════════
 async function fetchHistoryLog() {
   try {
-    const { data, error } = await sb
-      .from('case_history')
-      .select('*, case_diary(case_title, cnr_case_no, department, court_name, exparte_status, case_status)')
-      .order('created_at', { ascending: false });
-    if (error) throw error;
+    const historyQuery = (first, tiebreak) => {
+      let q = sb.from('case_history')
+        .select(CASE_HISTORY_COLUMNS, first ? { count: 'exact' } : undefined)
+        .order('created_at', { ascending: false });
+      return tiebreak ? q.order('id', { ascending: true }) : q;   // fixed order for equal timestamps so pages never overlap or skip rows
+    };
+    let data;
+    try { data = await pagedAll(first => historyQuery(first, true)); }
+    catch (e) { data = await pagedAll(first => historyQuery(first, false)); }   // e.g. id not readable
 
     HISTORY_ROWS = (data || []).map(r => ({
       entryDate:   r.created_at ? new Date(r.created_at) : null,

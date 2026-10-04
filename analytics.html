@@ -219,6 +219,14 @@ document.addEventListener("DOMContentLoaded", async function () {
     ).join('');
   }
 
+  // Chart instances are kept so a re-render replaces the old chart instead of stacking a new one on it.
+  let caseTypeChart = null, replyCourtChart = null;
+  // Axis text/grid colours follow the active theme (menu.css --muted / --border).
+  function chartColors() {
+    const css = getComputedStyle(document.documentElement);
+    return { text: (css.getPropertyValue('--muted') || '').trim() || '#64748B', grid: (css.getPropertyValue('--border') || '').trim() || 'rgba(0,0,0,.1)' };
+  }
+
   function renderCaseTypeChart(stats) {
     const canvas = $('caseTypeChart'), legend = $('caseTypeLegend');
     const entries = Object.entries(stats.byType).sort((a, b) => b[1] - a[1]);
@@ -230,7 +238,8 @@ document.addEventListener("DOMContentLoaded", async function () {
         </div>`).join('');
     }
     if (canvas && window.Chart) {
-      new Chart(canvas, {
+      if (caseTypeChart) caseTypeChart.destroy();
+      caseTypeChart = new Chart(canvas, {
         type: 'doughnut',
         data: { labels: entries.map(e => e[0]), datasets: [{ data: entries.map(e => e[1]), backgroundColor: entries.map((_, i) => PALETTE[i % PALETTE.length]), borderWidth: 0 }] },
         options: { plugins: { legend: { display: false } }, cutout: '60%' }
@@ -249,10 +258,14 @@ document.addEventListener("DOMContentLoaded", async function () {
     });
     const entries = Object.entries(map).sort((a, b) => b[1] - a[1]).slice(0, 8);
     if (canvas && window.Chart) {
-      new Chart(canvas, {
+      if (replyCourtChart) replyCourtChart.destroy();
+      const colors = chartColors();
+      replyCourtChart = new Chart(canvas, {
         type: 'bar',
         data: { labels: entries.map(e => e[0]), datasets: [{ data: entries.map(e => e[1]), backgroundColor: '#C6A358', borderRadius: 4 }] },
-        options: { indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true, ticks: { stepSize: 1 } } } }
+        options: { indexAxis: 'y', plugins: { legend: { display: false } },
+          scales: { x: { beginAtZero: true, ticks: { stepSize: 1, color: colors.text }, grid: { color: colors.grid } },
+                    y: { ticks: { color: colors.text }, grid: { color: colors.grid } } } }
       });
     }
   }
@@ -284,18 +297,34 @@ document.addEventListener("DOMContentLoaded", async function () {
     renderList($('missingReplyList'), missingReply, 'No pending replies due soon 🎉');
   }
 
-  try {
-    const rows = await DLO.fetchCaseDiary();
-    if (!rows.length) {
-      DLO.showToast('No case data returned — check Supabase connection', 'warn', 5000);
-      return;
-    }
+  let currentRows = [];
+  function renderAll(rows) {
+    currentRows = rows;
     const stats = DLO.calculateStats(rows);
     renderDisposalRate(stats);
     renderDeptPerf(rows);
     renderCaseTypeChart(stats);
     renderReplyCourtChart(rows);
     renderAlertLists(rows);
+  }
+  // Fresh rows arriving after the cached ones were shown replace them in place (no page reload).
+  document.addEventListener('dlo:case-diary-updated', function (event) {
+    if (event.detail && Array.isArray(event.detail.rows) && event.detail.rows.length) renderAll(event.detail.rows);
+  });
+  // Re-colour the chart axes when the theme is switched.
+  document.addEventListener('dlo:theme-changed', function () {
+    if (currentRows.length) renderReplyCourtChart(currentRows);
+  });
+
+  try {
+    const rows = await DLO.fetchCaseDiary();
+    if (!rows.length) {
+      const failed = DLO.getCaseDiaryError && DLO.getCaseDiaryError();
+      DLO.showToast(failed ? (navigator.onLine === false ? 'You appear to be offline' : 'Could not load case data — check Supabase connection')
+                           : 'No case data returned', failed ? 'error' : 'warn', 5000);
+      return;
+    }
+    renderAll(rows);
   } catch (e) {
     console.error('[Analytics] failed to load case data:', e);
     DLO.showToast('Failed to load analytics data', 'error', 5000);

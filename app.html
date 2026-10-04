@@ -2562,49 +2562,13 @@ document.addEventListener('DOMContentLoaded', function () {
     if (!document.documentElement.classList.contains('app-mode') || !event.detail || !Array.isArray(event.detail.rows)) return;
     renderDashboardStats(DLO.calculateStats(event.detail.rows), event.detail.rows);
   });
-  async function fetchAppDashboardRows() {
-    if (!window.DLO || typeof DLO.getSupabaseClient !== 'function') {
+  // Uses the shared, cached, fully paged case_diary loader (DLO.fetchCaseDiary):
+  // cached rows show immediately and fresh rows arrive via 'dlo:case-diary-updated'.
+  async function fetchAppDashboardRows(force) {
+    if (!window.DLO || typeof DLO.fetchCaseDiary !== 'function') {
       throw new Error('The case service is unavailable.');
     }
-    var client = DLO.getSupabaseClient();
-    if (!client) throw new Error('The case service is unavailable.');
-
-    // Request only the public case-search fields; avoid select('*') so the
-    // app never asks for columns outside the website's public allowlist.
-    var fields = [
-      'cnr_case_no', 'case_title', 'subject_matter', 'department', 'court_name',
-      'last_proceedings', 'reply_status', 'case_status', 'case_type',
-      'advocate_name', 'exparte_status', 'next_hearing_date'
-    ].join(',');
-    var rawRows = [];
-    var pageSize = 1000;
-    for (var start = 0; ; start += pageSize) {
-      var response = await client.from('case_diary')
-        .select(fields)
-        .order('cnr_case_no', { ascending: true, nullsFirst: false })
-        .range(start, start + pageSize - 1);
-      if (response.error) throw response.error;
-      var page = response.data || [];
-      rawRows = rawRows.concat(page);
-      if (page.length < pageSize) break;
-    }
-
-    return rawRows.map(function (row) {
-      return {
-        cnrCaseNo: row.cnr_case_no || '',
-        caseTitle: row.case_title || '',
-        subjectMatter: row.subject_matter || '',
-        department: row.department || 'Unknown',
-        court: row.court_name || 'Unknown',
-        lastProceedings: row.last_proceedings || '',
-        nextHearing: row.next_hearing_date || null,
-        reply: row.reply_status || '',
-        status: row.case_status || '',
-        type: row.case_type || 'Other',
-        advocateName: row.advocate_name || '',
-        exparte: row.exparte_status || ''
-      };
-    });
+    return DLO.fetchCaseDiary(!!force);
   }
   async function loadDashboardStats(force) {
     if (dashboardRetry) dashboardRetry.disabled = true;
@@ -2612,7 +2576,7 @@ document.addEventListener('DOMContentLoaded', function () {
       if (!window.DLO || typeof DLO.calculateStats !== 'function') {
         throw new Error('Dashboard data is unavailable.');
       }
-      var rows = await fetchAppDashboardRows();
+      var rows = await fetchAppDashboardRows(force);
       if (!Array.isArray(rows) || !rows.length) throw new Error('No case data was returned.');
       var stats = DLO.calculateStats(rows);
       if (!stats || !Number.isFinite(Number(stats.total))) throw new Error('Dashboard totals are unavailable.');
